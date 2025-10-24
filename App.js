@@ -1,20 +1,72 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+
+
+import HomeScreen from './screens/HomeScreen';
+import AIStylist from './screens/AIStylist';
+import Wardrobe from './screens/Wardrobe';
+import Profile from './screens/Profile';
+import Profiles from './screens/Profiles';
+import { Home, ShoppingBag, Camera, Users, User } from "lucide-react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer >
+      <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#00A6A6",
+        tabBarInactiveTintColor: "#6b7280",
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          tabBarIcon: () => <Home color="#00A6A6" size={28} />, // couleur et taille fixes
+        }} 
+       />
+      <Tab.Screen
+        name="Wardrobe"
+        component={Wardrobe}
+        options={{
+          tabBarIcon: () => <ShoppingBag color="#FF7F50" size={24} />, // couleur et taille différentes
+        }}
+      />
+      <Tab.Screen
+        name="AIStylist"
+        component={AIStylist}
+        options={{
+          tabBarIcon: () => <Camera color="#8A2BE2" size={26} />,
+        }}
+      />
+      <Tab.Screen
+        name="Profiles"
+        component={Profiles}
+        options={{
+          tabBarIcon: () => <Users color="#20B2AA" size={30} />,
+        }}
+      /> 
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarIcon: () => <User color="#20B2AA" size={30} />,
+        }}
+      /> 
+       </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+// });
