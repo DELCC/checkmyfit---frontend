@@ -7,15 +7,53 @@ import CameraViewStyle from "../components/CameraViewStyle";
 export default function AIStylist() {
   const [modalVisible, setModalVisible] = useState(false);
   const [ previewPicture, setPreviewPicture] = useState('');
+  const [ promptInput, setPromptInput] = useState('');
 
+  const formData = new FormData();
+
+  const IP_ADDRESS='192.168.100.31';
+  // const CLOUDINARY_CLOUD_NAME = 'drhn4tr0d';
+  // const KEY = '755575821876645';
+  // const SECRET = '_IiGv_UflvAoB3Nlekk0Dy4DfhY';
+  // const credentials = btoa(`${KEY}:${SECRET}`);
   const showPreviewPicture = (photo) => {
     setPreviewPicture(photo.uri);
     console.log(photo.uri);
   };
-
+  // Faire une route + obligé de stocker la photo pour pouvoir recevoir une recommendation de l'API
   const onSubmit = () => {
-    // setModalVisible(true);
-  };
+          formData.append('photoFromFront', {
+          uri: previewPicture,
+          name: 'photo.jpg',
+          type: 'image/jpeg',
+          });
+
+//           fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis/${previewPicture}`, {
+//           method: 'POST',
+//           body: formData,
+//           }).then((response) => response.json())
+//           .then((data) => {
+//             console.log(data);
+// });
+ fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
+          method: 'POST',
+          body: formData,
+          }).then((response) => response.json())
+          .then((data) =>{
+            if (data.result) {
+              fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`,{
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+              picture: data.url,
+               prompts: "Describe the picture"})
+              }).then(response => response.json())
+              .then(data => console.log(data.analysis.data.analysis));
+            }
+});
+
+};
+
 
   const handleTakePhoto = () => {
     setModalVisible(true);
