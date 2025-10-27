@@ -57,6 +57,7 @@ export default function Profile({ navigation }) {
         hana work
         hana work
         hana work
+        hana work
         */}
         <TouchableOpacity
           onPress={() => handleLogout()}
@@ -65,6 +66,10 @@ export default function Profile({ navigation }) {
           <Text style={[styles.buttonText, styles.textDark]}>
             Se déconnecter
           </Text>
+        </TouchableOpacity>
+        {/* BUTTON TO REACH EDIT PROFILE PAGE BELOW */}
+        <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
+          <Text>Edit your profile</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaProvider>
