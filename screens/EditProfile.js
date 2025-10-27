@@ -46,10 +46,10 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   const [bodyOpen, setBodyOpen] = useState(false);
   const [skinOpen, setSkinOpen] = useState(false);
   const [styleOpen, setStyleOpen] = useState(false);
-
+  
   const dispatch = useDispatch();
   const user = useSelector((state) => state.users.value);
-  const infoUser = user.infoUser;
+  
 
   // Image picker
   //   const handleImagePick = () => {
@@ -64,9 +64,9 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   //   };
 
   const handleEdit = () => {
-    if (!!user.token) return;
+    if (!user.token) return;
 
-    fetch(`http://192.168.100.171:3000/users/${user.token}`, {
+    fetch(`http://192.168.100.31:3000/users/${user.token}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -78,11 +78,19 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
         stylepreferences: stylePreferences,
       }),
     })
-      .then((res) => res.json())
+      .then((response) => response.json())
       .then((data) => {
-        if (data.user) {
-          dispatch(updateUser(data.user));
-          console.log("hello");
+        if (data) {
+          dispatch(updateUser({
+            bio: data.user.bio,
+            bodytype: data.user.bodytype,
+            poids : data.user.poids,
+            skintone: data.user.skintone,
+            stylepreferences: data.user.stylepreferences,
+            taille : data.user.taille,
+            profilepic : data.user.profilepic
+          }));
+          console.log(user);
         }
       })
       .catch(() => console.log("error"));
