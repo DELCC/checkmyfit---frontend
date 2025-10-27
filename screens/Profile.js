@@ -26,6 +26,10 @@ export default function Profile({ navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate("Auth")}>
           <Text>Go to Auth Page</Text>
         </TouchableOpacity>
+        {/* BUTTON TO REACH EDIT PROFILE PAGE BELOW */}
+        <TouchableOpacity onPress={() => navigation.navigate("EditProfile")}>
+          <Text>Edit your profile</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaProvider>
   );
