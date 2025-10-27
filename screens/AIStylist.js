@@ -35,10 +35,13 @@ export default function AIStylist() {
                 headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
               picture: data.url,
-               prompts: ["Rate my Style"]
+               prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
               })
               }).then(response => response.json())
-              .then(data => {setAnalysis(data.analysis.data.responses); console.log(data)});
+              .then(data => {
+                // setAnalysis(data.analysis.data.responses);
+                 console.log(data.data.data.analysis.responses);
+                });
             }
 });
 
