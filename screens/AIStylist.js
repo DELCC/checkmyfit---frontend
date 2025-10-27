@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet ,TextInput, ScrollView, Modal, Image} from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Bell, Settings,Camera as CameraIcon, Sparkles } from "lucide-react-native";
+import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import CameraViewStyle from "../components/CameraViewStyle";
 
@@ -8,34 +8,23 @@ export default function AIStylist() {
   const [modalVisible, setModalVisible] = useState(false);
   const [ previewPicture, setPreviewPicture] = useState('');
   const [ promptInput, setPromptInput] = useState('');
-
+  const [analysis, setAnalysis] = useState('');
   const formData = new FormData();
 
   const IP_ADDRESS='192.168.100.31';
-  // const CLOUDINARY_CLOUD_NAME = 'drhn4tr0d';
-  // const KEY = '755575821876645';
-  // const SECRET = '_IiGv_UflvAoB3Nlekk0Dy4DfhY';
-  // const credentials = btoa(`${KEY}:${SECRET}`);
+  
   const showPreviewPicture = (photo) => {
     setPreviewPicture(photo.uri);
     console.log(photo.uri);
   };
-  // Faire une route + obligé de stocker la photo pour pouvoir recevoir une recommendation de l'API
+  
   const onSubmit = () => {
           formData.append('photoFromFront', {
           uri: previewPicture,
           name: 'photo.jpg',
           type: 'image/jpeg',
           });
-
-//           fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis/${previewPicture}`, {
-//           method: 'POST',
-//           body: formData,
-//           }).then((response) => response.json())
-//           .then((data) => {
-//             console.log(data);
-// });
- fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
+       fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
           method: 'POST',
           body: formData,
           }).then((response) => response.json())
@@ -46,13 +35,15 @@ export default function AIStylist() {
                 headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
               picture: data.url,
-               prompts: "Describe the picture"})
+               prompts: ["Rate my Style"]
+              })
               }).then(response => response.json())
-              .then(data => console.log(data.analysis.data.analysis));
+              .then(data => {setAnalysis(data.analysis.data.responses); console.log(data)});
             }
 });
 
 };
+
 
 
   const handleTakePhoto = () => {
@@ -62,21 +53,6 @@ console.log(previewPicture);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        {/* <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>Check My Fit AI</Text>
-            <Text style={styles.subtitle}>UI Kit Showcase</Text>
-          </View>
-          <View style={styles.icons}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Bell size={20} color="#333" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Settings size={20} color="#333" />
-            </TouchableOpacity>
-          </View>
-        </View> */}
-
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
       <View style={styles.header}>
@@ -117,6 +93,8 @@ console.log(previewPicture);
           placeholder="e.g., 'Here's my look for a job interview — is it OK?'"
           placeholderTextColor="#999"
           multiline
+          onChangeText={(value) => setPromptInput(value)}
+          value={promptInput}
         />
       </View>
 
@@ -135,26 +113,7 @@ console.log(previewPicture);
   }
 
   const styles = StyleSheet.create({
-    // container: { flex: 1, backgroundColor: "#fff" },
-    // header: {
-    //   flexDirection: "row",
-    //   justifyContent: "space-between",
-    //   alignItems: "center",
-    //   padding: 16,
-    //   borderBottomWidth: 1,
-    //   borderBottomColor: "#e5e7eb",
-    // },
-    // title: { fontSize: 20, fontWeight: "700", color: "#00A896" },
-    // subtitle: { fontSize: 14, color: "#6b7280" },
-    // icons: { flexDirection: "row", gap: 8 },
-    // iconButton: {
-    //   width: 40,
-    //   height: 40,
-    //   borderRadius: 20,
-    //   backgroundColor: "#f3f4f6",
-    //   alignItems: "center",
-    //   justifyContent: "center",
-    // },
+
     container: {
     flex: 1,
     backgroundColor: "#FAFAFA", // équiv. var(--off-white)
