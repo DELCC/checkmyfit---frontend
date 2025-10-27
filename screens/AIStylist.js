@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet ,TextInput, ScrollView, Modal} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet ,TextInput, ScrollView, Modal, Image} from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Bell, Settings,Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
@@ -6,11 +6,21 @@ import CameraViewStyle from "../components/CameraViewStyle";
 
 export default function AIStylist() {
   const [modalVisible, setModalVisible] = useState(false);
-  
-  const onSubmit = () => {
-    setModalVisible(true);
+  const [ previewPicture, setPreviewPicture] = useState('');
+
+  const showPreviewPicture = (photo) => {
+    setPreviewPicture(photo.uri);
+    console.log(photo.uri);
   };
 
+  const onSubmit = () => {
+    // setModalVisible(true);
+  };
+
+  const handleTakePhoto = () => {
+    setModalVisible(true);
+  };
+console.log(previewPicture);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -41,16 +51,22 @@ export default function AIStylist() {
 
       {/* Camera Preview */}
       <View style={styles.previewContainer}>
-        <View style={styles.previewBox}>
+        {previewPicture? (<View style={styles.previewBox}>
+              <Image source={{
+          uri: previewPicture,
+        }} 
+        style={styles.previewImage}
+        resizeMode="cover" />
+        </View>) : (<View style={styles.previewBox}>
           <View style={styles.previewIconContainer}>
             <CameraIcon size={48} color="#999" />
           </View>
           <Text style={styles.previewText}>Camera Preview</Text>
-        </View>
+        </View>)}
       </View>
 
       {/* Take Picture Button */}
-      <TouchableOpacity style={[styles.button, styles.cameraButton]}>
+      <TouchableOpacity style={[styles.button, styles.cameraButton]} onPress={() => handleTakePhoto()}>
         <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
         <Text style={styles.buttonText}>Take Picture</Text>
       </TouchableOpacity>
@@ -72,7 +88,7 @@ export default function AIStylist() {
         <Text style={styles.buttonText}>Submit for AI Review</Text>
       </TouchableOpacity>
        <Modal visible={modalVisible} animationType="slide" transparent={false}>
-        <CameraViewStyle onClose={() => setModalVisible(false)} />
+        <CameraViewStyle onClose={() => setModalVisible(false)} showPreviewPicture={showPreviewPicture} />
       </Modal>
     </ScrollView>
         </SafeAreaView>
@@ -206,4 +222,9 @@ export default function AIStylist() {
     padding: 12,
     textAlignVertical: "top",
   },
+  previewImage: {
+  width: "100%",
+  height: "100%",
+  borderRadius: 16,
+},
 });

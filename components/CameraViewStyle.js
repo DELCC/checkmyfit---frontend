@@ -5,8 +5,9 @@ import { View,  TouchableOpacity, StyleSheet } from "react-native";
 import { Camera as CameraIcon, Sparkles, X } from "lucide-react-native";
 
 
-export default function CameraViewStyle({ onClose }) {
+export default function CameraViewStyle({ onClose, showPreviewPicture } ) {
   const isFocused = useIsFocused();
+
 
   const [hasPermission, setHasPermission] = useState(false);
 
@@ -15,7 +16,11 @@ export default function CameraViewStyle({ onClose }) {
 
   const takePicture = async () => {                 
     const photo = await cameraRef.current?.takePictureAsync({ quality: 0.3 }); 
-    photo && console.log(photo);         
+    photo && console.log(photo); 
+          if (photo) {
+        console.log(photo);
+        showPreviewPicture(photo); 
+      }
   };
 
 
