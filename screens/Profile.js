@@ -57,6 +57,7 @@ export default function Profile({ navigation }) {
         hana work
         hana work
         hana work
+        hana work
         */}
         <TouchableOpacity
           onPress={() => handleLogout()}
