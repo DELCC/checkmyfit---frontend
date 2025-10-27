@@ -1,5 +1,3 @@
-
-
 import HomeScreen from './screens/HomeScreen';
 import AIStylist from './screens/AIStylist';
 import Wardrobe from './screens/Wardrobe';
