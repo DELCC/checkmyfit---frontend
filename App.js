@@ -79,6 +79,7 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={TabNavigator} />
         <Stack.Screen name="Auth" component={Auth} />
         <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   </Provider>
