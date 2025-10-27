@@ -34,6 +34,8 @@ export default function Auth({ navigation }) {
         if (data.token) {
           dispatch(addUserToStore(data.token));
           navigation.navigate("Home");
+          setPassword("");
+          setUsername("");
         } else {
           console.log("incorrect password or username");
         }

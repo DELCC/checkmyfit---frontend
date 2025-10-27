@@ -1,11 +1,12 @@
-import HomeScreen from "./screens/HomeScreen";
+import DesignKit from "./screens/DesignKit";
 import AIStylist from "./screens/AIStylist";
 import Wardrobe from "./screens/Wardrobe";
 import Profile from "./screens/Profile";
 import Profiles from "./screens/Profiles";
 import Auth from "./screens/Auth";
 import Signup from "./screens/Signup";
-import EditProfile from "./screens/EditProfile"
+import EditProfile from "./screens/EditProfile";
+import HomeScreen from "./screens/Home";
 import { Home, ShoppingBag, Camera, Users, User } from "lucide-react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -17,11 +18,9 @@ import users from "./reducers/users";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-
 const store = configureStore({
   reducer: { users },
 });
-
 
 export default function App() {
   function TabNavigator() {
@@ -55,8 +54,8 @@ export default function App() {
           }}
         />
         <Tab.Screen
-          name="Profiles"
-          component={Profiles}
+          name="DesignKit"
+          component={DesignKit}
           options={{
             tabBarIcon: () => <Users color="#20B2AA" size={30} />,
           }}
@@ -73,16 +72,16 @@ export default function App() {
   }
 
   return (
-      <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
-        <Stack.Screen name="Auth" component={Auth} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  </Provider>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Auth" component={Auth} />
+          <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen name="Home" component={TabNavigator} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
