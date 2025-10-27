@@ -8,10 +8,38 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { addUserToStore } from "../reducers/users";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Sparkles } from "lucide-react-native";
 
 export default function Auth({ navigation }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const dispatch = useDispatch();
+
+  const ipAdress = "192.168.100.144:3000";
+
+  const handleSignin = () => {
+    fetch(`http://${ipAdress}/users/signin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.token) {
+          dispatch(addUserToStore(data.token));
+          navigation.navigate("Home");
+        } else {
+          console.log("incorrect password or username");
+        }
+      });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -22,12 +50,14 @@ export default function Auth({ navigation }) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>Email</Text>
+          <Text style={styles.inputLabel}>Username</Text>
           <TextInput
-            placeholder="your@email.com"
+            placeholder="Username"
             style={[styles.input, styles.inputRounded]}
             placeholderTextColor="#9ca3af"
             keyboardType="email-address"
+            onChangeText={(value) => setUsername(value)}
+            value={username}
           />
         </View>
 
@@ -38,12 +68,15 @@ export default function Auth({ navigation }) {
             style={[styles.input, styles.inputRounded]}
             placeholderTextColor="#9ca3af"
             keyboardType="email-address"
+            onChangeText={(value) => setPassword(value)}
+            value={password}
           />
         </View>
 
         <TouchableOpacity
           style={[styles.button, styles.primaryButton]}
           activeOpacity={0.8}
+          onPress={() => handleSignin()}
         >
           <Sparkles size={18} color="#fff" style={styles.iconLeft} />
           <Text style={[styles.buttonText, styles.textLight]}>Sign In</Text>
