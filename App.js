@@ -5,7 +5,7 @@ import Profile from "./screens/Profile";
 import Profiles from "./screens/Profiles";
 import Auth from "./screens/Auth";
 import Signup from "./screens/Signup";
-import EditProfile from "./screens/EditProfile"
+import EditProfile from "./screens/EditProfile";
 import { Home, ShoppingBag, Camera, Users, User } from "lucide-react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -13,15 +13,14 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import users from "./reducers/users";
+import profile from "./reducers/profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-
 const store = configureStore({
   reducer: { users },
 });
-
 
 export default function App() {
   function TabNavigator() {
@@ -73,16 +72,16 @@ export default function App() {
   }
 
   return (
-      <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
-        <Stack.Screen name="Auth" component={Auth} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  </Provider>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <Stack.Screen name="Auth" component={Auth} />
+          <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 

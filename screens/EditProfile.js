@@ -12,6 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // import { launchImageLibrary } from "react-native-image-picker";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ArrowLeft, Camera } from "lucide-react-native";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUser } from "../reducers/users";
 
 const bodyTypes = ["Athletic", "Slim", "Average", "Curvy", "Plus Size"];
 const stylePreferencesOptions = [
@@ -27,7 +29,6 @@ const stylePreferencesOptions = [
   "Edgy",
 ];
 const skinTones = ["Fair", "Light", "Medium", "Tan", "Deep", "Dark"];
-
 
 export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   const [profileImage, setProfileImage] = useState(null);
@@ -46,26 +47,46 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   const [skinOpen, setSkinOpen] = useState(false);
   const [styleOpen, setStyleOpen] = useState(false);
 
-  // Image picker
-//   const handleImagePick = () => {
-//     launchImageLibrary(
-//       { mediaType: "photo", quality: 0.8 },
-//       (response) => {
-//         if (!response.didCancel && response.assets?.length > 0) {
-//           setProfileImage(response.assets[0].uri);
-//         }
-//       }
-//     );
-//   };
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.users.value);
+  const infoUser = user.infoUser;
 
-const verif = () => {
-console.log("bio", bio)
-console.log("height", height)
-console.log("weight", weight)
-console.log("bodyType", bodyType)
-console.log("skinTone", skinTone)
-console.log("stylePreferences", stylePreferences)
-}
+  // Image picker
+  //   const handleImagePick = () => {
+  //     launchImageLibrary(
+  //       { mediaType: "photo", quality: 0.8 },
+  //       (response) => {
+  //         if (!response.didCancel && response.assets?.length > 0) {
+  //           setProfileImage(response.assets[0].uri);
+  //         }
+  //       }
+  //     );
+  //   };
+
+  const handleEdit = () => {
+    if (!!user.token) return;
+
+    fetch(`http://192.168.100.171:3000/users/${user.token}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bio,
+        taille: height,
+        poids: weight,
+        skintone: skinTone,
+        bodytype: bodyType,
+        stylepreferences: stylePreferences,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          dispatch(updateUser(data.user));
+          console.log("hello");
+        }
+      })
+      .catch(() => console.log("error"));
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
@@ -93,7 +114,7 @@ console.log("stylePreferences", stylePreferences)
           </View>
         </View>
 
-        {/* Profile Picture */}
+        {/* Profile Pic */}
         <View style={styles.section}>
           <Text style={styles.label}>Profile Picture</Text>
           <View style={styles.profileRow}>
@@ -107,7 +128,9 @@ console.log("stylePreferences", stylePreferences)
               )}
             </View>
             <View style={{ flex: 1 }}>
-              <TouchableOpacity style={styles.uploadButton} /*onPress={handleImagePick}*/>
+              <TouchableOpacity
+                style={styles.uploadButton} /*onPress={handleImagePick}*/
+              >
                 <Camera size={18} color="white" style={{ marginRight: 6 }} />
                 <Text style={styles.uploadButtonText}>Upload Photo</Text>
               </TouchableOpacity>
@@ -133,7 +156,7 @@ console.log("stylePreferences", stylePreferences)
           style={styles.input}
           value={height}
           onChangeText={setHeight}
-          placeholder='180'
+          placeholder="180"
         />
 
         {/* Weight */}
@@ -146,7 +169,7 @@ console.log("stylePreferences", stylePreferences)
           keyboardType="numeric"
         />
 
-        {/* Skin Tone */}
+        {/* Skintone */}
         <Text style={styles.label}>Skin Tone</Text>
         <DropDownPicker
           open={skinOpen}
@@ -159,7 +182,7 @@ console.log("stylePreferences", stylePreferences)
           zIndex={3000}
         />
 
-        {/* Body Type */}
+        {/* Bodytype */}
         <Text style={styles.label}>Body Type</Text>
         <DropDownPicker
           open={bodyOpen}
@@ -172,7 +195,7 @@ console.log("stylePreferences", stylePreferences)
           zIndex={2000}
         />
 
-        {/* Style Preferences */}
+        {/* Style pref */}
         <Text style={styles.label}>Style Preferences</Text>
         <DropDownPicker
           multiple={true}
@@ -191,8 +214,8 @@ console.log("stylePreferences", stylePreferences)
           zIndex={1000}
         />
 
-        {/* Save Button */}
-        <TouchableOpacity style={styles.saveButton} onPress={verif}>
+        {/* Save Btn */}
+        <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
           <Text style={styles.saveButtonText}>
             {isFirstTimeSetup ? "Complete Setup" : "Save Changes"}
           </Text>
@@ -313,4 +336,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
