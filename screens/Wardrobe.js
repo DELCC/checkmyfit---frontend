@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Modal,
 } from "react-native";
 import { Filter, Plus } from "lucide-react-native";
 import { ClosetItemModal } from "../components/ClosetItemModal";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Bell, Settings } from "lucide-react-native";
+import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
+import CameraViewStyle from "../components/CameraViewStyle";
 
 const closetCategories = [
   "All",
@@ -22,11 +25,13 @@ const closetCategories = [
   "Accessories",
 ];
 
-export default function Wardrobe({ onAddItem, initialCategory }) {
+export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
   const [selectedCategory, setSelectedCategory] = useState(
     initialCategory || "All"
   );
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const ipAdress = "192.168.100.31:3000";
 
   const items = Array.from({ length: 18 }, (_, i) => ({
     id: i + 1,
@@ -61,7 +66,10 @@ export default function Wardrobe({ onAddItem, initialCategory }) {
             <TouchableOpacity style={styles.filterButton}>
               <Filter width={16} height={16} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.addButton} onPress={onAddItem}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate("addItem")}
+            >
               <Plus width={16} height={16} />
               <Text style={styles.addButtonText}>Add Item</Text>
             </TouchableOpacity>

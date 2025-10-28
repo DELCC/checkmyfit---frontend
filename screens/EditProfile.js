@@ -107,7 +107,10 @@ export default function EditProfile({
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
@@ -138,121 +141,131 @@ export default function EditProfile({
           </View>
 
           {/* Profile Pic */}
-          <View style={styles.section}>
-            <Text style={styles.label}>Profile Picture</Text>
-            <View style={styles.profileRow}>
-              <View style={styles.avatarWrapper}>
-                {profileImage ? (
-                  <Image source={{ uri: profileImage }} style={styles.avatar} />
-                ) : (
-                  <View style={styles.avatarPlaceholder}>
-                    <Text style={styles.avatarText}>JD</Text>
-                  </View>
-                )}
-              </View>
-              <View style={{ flex: 1 }}>
-                <TouchableOpacity
-                  style={styles.uploadButton} /*onPress={handleImagePick}*/
-                >
-                  <Camera size={18} color="white" style={{ marginRight: 6 }} />
-                  <Text style={styles.uploadButtonText}>Upload Photo</Text>
-                </TouchableOpacity>
-                <Text style={styles.helperText}>JPG, PNG up to 5MB</Text>
+          <View style={styles.body}>
+            <View style={styles.section}>
+              <Text style={styles.label}>Profile Picture</Text>
+              <View style={styles.profileRow}>
+                <View style={styles.avatarWrapper}>
+                  {profileImage ? (
+                    <Image
+                      source={{ uri: profileImage }}
+                      style={styles.avatar}
+                    />
+                  ) : (
+                    <View style={styles.avatarPlaceholder}>
+                      <Text style={styles.avatarText}>JD</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <TouchableOpacity
+                    style={styles.uploadButton} /*onPress={handleImagePick}*/
+                  >
+                    <Camera
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text style={styles.uploadButtonText}>Upload Photo</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.helperText}>JPG, PNG up to 5MB</Text>
+                </View>
               </View>
             </View>
+
+            <View style={styles.editSection}>
+              {/* Bio */}
+              <Text style={styles.label}>Bio</Text>
+              <TextInput
+                style={styles.input}
+                value={bio}
+                onChangeText={setBio}
+                placeholder="Tell us about your style..."
+                multiline
+                numberOfLines={3}
+              />
+
+              {/* Height */}
+              <Text style={styles.label}>Height (cm)</Text>
+              <TextInput
+                style={styles.input}
+                value={height}
+                onChangeText={setHeight}
+                placeholder="180"
+              />
+
+              {/* Weight */}
+              <Text style={styles.label}>Weight (kg)</Text>
+              <TextInput
+                style={styles.input}
+                value={weight}
+                onChangeText={setWeight}
+                placeholder="80"
+                keyboardType="numeric"
+              />
+
+              {/* Skintone */}
+              <Text style={styles.label}>Skin Tone</Text>
+              <DropDownPicker
+                style={styles.input}
+                open={skinOpen}
+                value={skinTone}
+                items={skinTones.map((tone) => ({ label: tone, value: tone }))}
+                setOpen={setSkinOpen}
+                setValue={setSkinTone}
+                containerStyle={{ marginBottom: 16 }}
+                dropDownContainerStyle={{ maxHeight: 150 }}
+                zIndex={3000}
+                dropDownDirection="BOTTOM"
+                listMode="SCROLLVIEW"
+              />
+
+              {/* Bodytype */}
+              <Text style={styles.label}>Body Type</Text>
+              <DropDownPicker
+                style={styles.input}
+                open={bodyOpen}
+                value={bodyType}
+                items={bodyTypes.map((type) => ({ label: type, value: type }))}
+                setOpen={setBodyOpen}
+                setValue={setBodyType}
+                containerStyle={{ marginBottom: 16 }}
+                dropDownContainerStyle={{ maxHeight: 150 }}
+                zIndex={2000}
+                dropDownDirection="BOTTOM"
+                listMode="SCROLLVIEW"
+              />
+
+              {/* Style pref */}
+              <Text style={styles.label}>Style Preferences</Text>
+              <DropDownPicker
+                style={styles.input}
+                multiple={true}
+                min={0}
+                max={stylePreferencesOptions.length}
+                open={styleOpen}
+                value={stylePreferences}
+                items={stylePreferencesOptions.map((style) => ({
+                  label: style,
+                  value: style,
+                }))}
+                setOpen={setStyleOpen}
+                setValue={setStylePreferences}
+                containerStyle={{ marginBottom: 16 }}
+                dropDownContainerStyle={{ maxHeight: 150 }}
+                zIndex={1000}
+                dropDownDirection="BOTTOM"
+                listMode="SCROLLVIEW"
+              />
+
+              {/* Save Btn */}
+              <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
+                <Text style={styles.saveButtonText}>
+                  {route.params?.isNewUser ? "Complete Setup" : "Save Changes"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <View style={styles.editSection}>
-            {/* Bio */}
-            <Text style={styles.label}>Bio</Text>
-            <TextInput
-              style={styles.input}
-              value={bio}
-              onChangeText={setBio}
-              placeholder="Tell us about your style..."
-              multiline
-              numberOfLines={3}
-            />
-
-            {/* Height */}
-            <Text style={styles.label}>Height (cm)</Text>
-            <TextInput
-              style={styles.input}
-              value={height}
-              onChangeText={setHeight}
-              placeholder="180"
-            />
-
-            {/* Weight */}
-            <Text style={styles.label}>Weight (kg)</Text>
-            <TextInput
-              style={styles.input}
-              value={weight}
-              onChangeText={setWeight}
-              placeholder="80"
-              keyboardType="numeric"
-            />
-
-            {/* Skintone */}
-            <Text style={styles.label}>Skin Tone</Text>
-            <DropDownPicker
-              style={styles.input}
-              open={skinOpen}
-              value={skinTone}
-              items={skinTones.map((tone) => ({ label: tone, value: tone }))}
-              setOpen={setSkinOpen}
-              setValue={setSkinTone}
-              containerStyle={{ marginBottom: 16 }}
-              dropDownContainerStyle={{ maxHeight: 150 }}
-              zIndex={3000}
-              dropDownDirection="BOTTOM"
-              listMode="SCROLLVIEW"
-            />
-
-            {/* Bodytype */}
-            <Text style={styles.label}>Body Type</Text>
-            <DropDownPicker
-              style={styles.input}
-              open={bodyOpen}
-              value={bodyType}
-              items={bodyTypes.map((type) => ({ label: type, value: type }))}
-              setOpen={setBodyOpen}
-              setValue={setBodyType}
-              containerStyle={{ marginBottom: 16 }}
-              dropDownContainerStyle={{ maxHeight: 150 }}
-              zIndex={2000}
-              dropDownDirection="BOTTOM"
-              listMode="SCROLLVIEW"
-            />
-
-            {/* Style pref */}
-            <Text style={styles.label}>Style Preferences</Text>
-            <DropDownPicker
-              style={styles.input}
-              multiple={true}
-              min={0}
-              max={stylePreferencesOptions.length}
-              open={styleOpen}
-              value={stylePreferences}
-              items={stylePreferencesOptions.map((style) => ({
-                label: style,
-                value: style,
-              }))}
-              setOpen={setStyleOpen}
-              setValue={setStylePreferences}
-              containerStyle={{ marginBottom: 16 }}
-              dropDownContainerStyle={{ maxHeight: 150 }}
-              zIndex={1000}
-              dropDownDirection="BOTTOM"
-              listMode="SCROLLVIEW"
-            />
-          </View>
-          {/* Save Btn */}
-          <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
-            <Text style={styles.saveButtonText}>
-              {route.params?.isNewUser ? "Complete Setup" : "Save Changes"}
-            </Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -262,12 +275,16 @@ export default function EditProfile({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#ffffffff",
+  },
+  body: {
+    flex: 1,
+    backgroundColor: "#FAFAF9",
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 250,
-    position: "relative",
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    paddingBottom: 180,
   },
   header: {
     flexDirection: "row",
@@ -281,46 +298,56 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   headerTitle: {
-    fontSize: 14,
-    color: "#6b7280",
+    color: "#111827",
+    fontSize: 20,
+    fontWeight: "600",
   },
   headerSubtitle: {
     color: "#6B7280",
     fontSize: 14,
+    marginTop: 2,
   },
   editSection: {
-    flex: 1,
-    justifyContent: "center",
+    // flex: 1,
+    padding: 15,
   },
   section: {
-    padding: 10,
+    paddingHorizontal: 20,
     marginBottom: 24,
   },
   label: {
-    fontWeight: "bold",
-    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: "600",
     color: "#111827",
-    padding: 10,
+    marginBottom: 8,
   },
   input: {
-    height: 44,
-    width: "90%",
-    backgroundColor: "#f3f4f6",
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    paddingHorizontal: 12,
-    color: "#111827",
-    fontSize: 16,
     borderRadius: 12,
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 10,
+    height: 48,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    fontSize: 16,
+    color: "#111827",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 3,
   },
   textarea: {
-    backgroundColor: "white",
-    padding: 12,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 8,
-    marginBottom: 16,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    padding: 12,
     textAlignVertical: "top",
+    fontSize: 16,
+    height: 90,
   },
   profileRow: {
     flexDirection: "row",
@@ -331,9 +358,15 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
+    borderWidth: 4,
+    borderColor: "#A7F3D0",
     overflow: "hidden",
-    borderWidth: 3,
-    borderColor: "#34D399",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   avatar: {
     width: "100%",
@@ -360,10 +393,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 8,
     alignSelf: "flex-start",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   uploadButtonText: {
     color: "white",
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontSize: 14,
   },
   helperText: {
     fontSize: 12,
@@ -379,7 +417,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 16,
+    fontWeight: "600",
   },
 });

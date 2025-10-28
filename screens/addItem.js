@@ -11,23 +11,19 @@ import {
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
-import CameraViewStyle from "../components/CameraViewStyle";
 import AIResponse from "../components/AIResponse";
+import CameraViewStyleItem from "../components/CameraViewStyleItem";
 
-export default function AIStylist() {
+export default function addItem({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
   const [modalResultVisible, setModalResultVisible] = useState(false);
   const [previewPicture, setPreviewPicture] = useState("");
-  const [picture, setPicture] = useState("");
   const [promptInput, setPromptInput] = useState("");
-  const [starRate, setStarRate] = useState("");
-  const [ styleComments, setStyleComments] = useState("");
-  const [improvementSuggestions, setImprovementSuggestions] = useState("");
- 
+  const [analysis, setAnalysis] = useState("");
   const formData = new FormData();
 
-  const IP_ADDRESS = "192.168.100.31";
+  const IP_ADDRESS = "192.168.100.171";
 
   const selectedStylist = {
     initials: "CD",
@@ -35,11 +31,13 @@ export default function AIStylist() {
     tagline: "Fashion Enthousiasm",
   };
 
+  // Inverse Data Flow - get photo uri from CameraViewStyleItem.js
   const showPreviewPicture = (photo) => {
     setPreviewPicture(photo.uri);
     console.log(photo.uri);
   };
 
+  // Send the item in DB - TO BE CHANGED
   const onSubmit = () => {
     setIsLoading(true);
     formData.append("photoFromFront", {
@@ -54,8 +52,6 @@ export default function AIStylist() {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          console.log(data.url);
-          setPicture(data.url);
           fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -63,54 +59,27 @@ export default function AIStylist() {
               picture: data.url,
               //  prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
               prompts: [
-                // 'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
-                `You are an AI stylist named Ruddy. Your personality is encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: ${promptInput}. Analyze the outfit in the image and the context of the user's prompt. Respond ONLY as a raw JSON object with this exact structure: {rating: number from 1 to 5, comment: string max 260 chars, suggestions: array of 4 strings max 40 chars each}. Stay in character and provide helpful, motivational, and positive advice in line with Ruddy’s style.`,
+                "Rate my Style",
+                'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
               ],
             }),
           })
             .then((response) => response.json())
             .then((data) => {
               // setAnalysis(data.analysis.data.responses);
-              const rawResponse = data.data.data.analysis.responses;
-              console.log(rawResponse);
-              const stringValue = rawResponse[0].value;
-              console.log(stringValue);
-              const AIResultObject =JSON.parse(stringValue);
-              console.log(AIResultObject);
-              console.log(AIResultObject.suggestions);
+              console.log(data.data.data.analysis.responses);
               setIsLoading(false);
-              setStarRate(AIResultObject.rating);
-              setStyleComments(AIResultObject.comment);
-              setImprovementSuggestions(AIResultObject.suggestions);
-
-            })
-            .catch(error => console.log(error));
+            });
         }
         setModalResultVisible(true);
       });
   };
 
+  // Show Modal for picture
   const handleTakePhoto = () => {
     setModalPhotoVisible(true);
   };
-  // console.log(previewPicture);
-
-  const saveOutfit = () => {
-    fetch(`http://${IP_ADDRESS}:3000/outfits/:token`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                  user: data._id ,
-                  outfitPic: req.body.outfitPic ,
-                  rating: req.body.rating,
-                  comment: req.body.comment,
-                  suggestion: req.body.suggestion,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-  })};
-
+  console.log(previewPicture);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -123,8 +92,7 @@ export default function AIStylist() {
             <View style={styles.iconContainer}>
               <Sparkles size={32} color="#fff" />
             </View>
-            <Text style={styles.title}>Upload or Capture Your Look</Text>
-            <Text style={styles.subtitle}>Get AI feedback on your style</Text>
+            <Text style={styles.title}>Add item to your virtual dressing</Text>
           </View>
 
           {/* Camera Preview */}
@@ -158,33 +126,31 @@ export default function AIStylist() {
             <Text style={styles.buttonText}>Take Picture</Text>
           </TouchableOpacity>
 
-          {/* Message Input */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Add a message (optional)</Text>
-            <TextInput
-              style={styles.textarea}
-              placeholder="e.g., 'Here's my look for a job interview — is it OK?'"
-              placeholderTextColor="#999"
-              multiline
-              onChangeText={(value) => setPromptInput(value)}
-              value={promptInput}
-            />
-          </View>
-
           {/* Submit Button */}
           <TouchableOpacity
             onPress={() => onSubmit()}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Submit for AI Review</Text>
+            <Text style={styles.buttonText}>Add item</Text>
           </TouchableOpacity>
+
+          {/* Navigate to Home */}
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Home")}
+            style={[styles.button, styles.submitButton]}
+          >
+            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Go back Home</Text>
+          </TouchableOpacity>
+
           <Modal
             visible={modalPhotoVisible}
             animationType="slide"
             transparent={false}
           >
-            <CameraViewStyle
+            <CameraViewStyleItem
               onClose={() => setModalPhotoVisible(false)}
               showPreviewPicture={showPreviewPicture}
             />
@@ -198,11 +164,6 @@ export default function AIStylist() {
               onClose={() => setModalResultVisible(false)}
               selectedStylist={selectedStylist}
               isLoading={isLoading}
-              picture={picture}
-              starRate={starRate}
-              styleComments={styleComments}
-              improvementSuggestions={improvementSuggestions}
-              saveOutfit={saveOutfit}
             />
           </Modal>
         </ScrollView>
