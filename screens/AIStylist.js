@@ -19,11 +19,15 @@ export default function AIStylist() {
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
   const [modalResultVisible, setModalResultVisible] = useState(false);
   const [previewPicture, setPreviewPicture] = useState("");
+  const [picture, setPicture] = useState("");
   const [promptInput, setPromptInput] = useState("");
-  const [analysis, setAnalysis] = useState("");
+  const [starRate, setStarRate] = useState("");
+  const [ styleComments, setStyleComments] = useState("");
+  const [improvementSuggestions, setImprovementSuggestions] = useState("");
+ 
   const formData = new FormData();
 
-  const IP_ADDRESS = "192.168.100.171";
+  const IP_ADDRESS = "192.168.100.31";
 
   const selectedStylist = {
     initials: "CD",
@@ -50,6 +54,8 @@ export default function AIStylist() {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
+          console.log(data.url);
+          setPicture(data.url);
           fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -57,17 +63,28 @@ export default function AIStylist() {
               picture: data.url,
               //  prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
               prompts: [
-                "Rate my Style",
-                'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
+                // 'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
+                `You are an AI stylist named Ruddy. Your personality is encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: ${promptInput}. Analyze the outfit in the image and the context of the user's prompt. Respond ONLY as a raw JSON object with this exact structure: {rating: number from 1 to 5, comment: string max 260 chars, suggestions: array of 4 strings max 40 chars each}. Stay in character and provide helpful, motivational, and positive advice in line with Ruddy’s style.`,
               ],
             }),
           })
             .then((response) => response.json())
             .then((data) => {
               // setAnalysis(data.analysis.data.responses);
-              console.log(data.data.data.analysis.responses);
+              const rawResponse = data.data.data.analysis.responses;
+              console.log(rawResponse);
+              const stringValue = rawResponse[0].value;
+              console.log(stringValue);
+              const AIResultObject =JSON.parse(stringValue);
+              console.log(AIResultObject);
+              console.log(AIResultObject.suggestions);
               setIsLoading(false);
-            });
+              setStarRate(AIResultObject.rating);
+              setStyleComments(AIResultObject.comment);
+              setImprovementSuggestions(AIResultObject.suggestions);
+
+            })
+            .catch(error => console.log(error));
         }
         setModalResultVisible(true);
       });
@@ -76,7 +93,7 @@ export default function AIStylist() {
   const handleTakePhoto = () => {
     setModalPhotoVisible(true);
   };
-  console.log(previewPicture);
+  // console.log(previewPicture);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -164,6 +181,10 @@ export default function AIStylist() {
               onClose={() => setModalResultVisible(false)}
               selectedStylist={selectedStylist}
               isLoading={isLoading}
+              picture={picture}
+              starRate={starRate}
+              styleComments={styleComments}
+              improvementSuggestions={improvementSuggestions}
             />
           </Modal>
         </ScrollView>

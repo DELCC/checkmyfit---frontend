@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,Image } from 'react-native';
 import { ArrowLeft, Sparkles, Star } from 'lucide-react-native';
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function AIResponse({onClose, selectedStylist, isLoading }) {
+export default function AIResponse({onClose, selectedStylist, isLoading, picture, starRate, styleComments, improvementSuggestions }) {
   const suggestions = [
     'Consider a more structured blazer for a professional appearance',
     'The color palette works well together',
@@ -53,7 +53,11 @@ return (
 
       {/* Outfit Preview */}
       <View style={[styles.card, styles.outfitPreview]}>
-        <Text style={styles.mutedText}>Your Outfit</Text>
+       {picture ? ( <Image source={{
+                    uri: picture,
+                  }}
+                  style={styles.previewImage}
+                  resizeMode="cover" />   ): (<Text style={styles.mutedText}>Your Outfit</Text>)}
       </View>
 
       {/* General Rating */}
@@ -64,13 +68,13 @@ return (
             <Star
               key={star}
               size={32}
-              color={star <= 4 ? '#00C9A7' : '#CCCCCC'}
-              fill={star <= 4 ? '#00C9A7' : 'transparent'}
+              color={star <= starRate ? '#00C9A7' : '#CCCCCC'}
+              fill={star <=  starRate? '#00C9A7' : 'transparent'}
             />
           ))}
         </View>
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>4.0 / 5.0</Text>
+          <Text style={styles.badgeText}> {starRate} / 5</Text>
         </View>
       </View>
 
@@ -78,14 +82,15 @@ return (
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Style Comments</Text>
         <Text style={styles.commentText}>
-          Your overall look demonstrates a good understanding of professional attire. The fit is appropriate and the pieces coordinate well together. However, there are a few areas where we could elevate the outfit to make it more interview-ready and confidence-boosting.
+          {/* Your overall look demonstrates a good understanding of professional attire. The fit is appropriate and the pieces coordinate well together. However, there are a few areas where we could elevate the outfit to make it more interview-ready and confidence-boosting. */}
+            {styleComments}
         </Text>
       </View>
 
       {/* Improvement Suggestions */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Improvement Suggestions</Text>
-        {suggestions.map((suggestion, index) => (
+        {improvementSuggestions.map((suggestion, index) => (
           <View key={index} style={styles.suggestionItem}>
             <View style={styles.suggestionNumber}>
               <Text style={styles.suggestionNumberText}>{index + 1}</Text>
@@ -271,4 +276,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  previewImage: {
+  width: '100%',
+  height: 250,
+  borderRadius: 12,
+},
+
 });
