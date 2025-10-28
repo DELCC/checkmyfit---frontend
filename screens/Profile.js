@@ -7,6 +7,8 @@ import { logout } from "../reducers/users";
 
 const Stack = createNativeStackNavigator();
 
+// hello
+
 export default function Profile({ navigation }) {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.users.value.token);
