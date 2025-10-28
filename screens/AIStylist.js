@@ -6,6 +6,7 @@ import CameraViewStyle from "../components/CameraViewStyle";
 import AIResponse from "../components/AIResponse";
 
 export default function AIStylist() {
+  const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
   const [modalResultVisible, setModalResultVisible] = useState(false);
   const [ previewPicture, setPreviewPicture] = useState('');
@@ -27,6 +28,7 @@ export default function AIStylist() {
   };
   
   const onSubmit = () => {
+          setIsLoading(true);
           formData.append('photoFromFront', {
           uri: previewPicture,
           name: 'photo.jpg',
@@ -49,13 +51,13 @@ export default function AIStylist() {
               .then(data => {
                 // setAnalysis(data.analysis.data.responses);
                  console.log(data.data.data.analysis.responses);
+                 setIsLoading(false);
                 });
             }
             setModalResultVisible(true);
 });
 
 };
-
 
 
   const handleTakePhoto = () => {
@@ -119,7 +121,7 @@ console.log(previewPicture);
         <CameraViewStyle onClose={() => setModalPhotoVisible(false)} showPreviewPicture={showPreviewPicture} />
       </Modal>
       <Modal visible={modalResultVisible} animationType="slide" transparent={false}>
-        <AIResponse onClose={() => setModalPhotoVisible(false)} selectedStylist={selectedStylist} />
+        <AIResponse onClose={() => setModalResultVisible(false)} selectedStylist={selectedStylist} isLoading={isLoading} />
       </Modal>
     </ScrollView>
         </SafeAreaView>

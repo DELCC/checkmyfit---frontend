@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { ArrowLeft, Sparkles, Star } from 'lucide-react-native';
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function AIResponse({ onBack, selectedStylist }) {
+export default function AIResponse({onClose, selectedStylist, isLoading }) {
   const suggestions = [
     'Consider a more structured blazer for a professional appearance',
     'The color palette works well together',
@@ -11,7 +11,18 @@ export default function AIResponse({ onBack, selectedStylist }) {
     'Shoes could be more formal for the occasion',
   ];
 
-
+if (isLoading){
+return (
+<SafeAreaProvider>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text>Waiting for AI Assitant Review...</Text>
+      </View>
+    </SafeAreaView>
+</SafeAreaProvider>
+      );
+} else {
   return (
   <SafeAreaProvider>
     <SafeAreaView style={styles.container}>
@@ -19,7 +30,7 @@ export default function AIResponse({ onBack, selectedStylist }) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <TouchableOpacity onPress={onClose} style={styles.backButton}>
             <ArrowLeft color="#7A7A7A" size={24} />
           </TouchableOpacity>
           <View style={styles.headerTitle}>
@@ -89,7 +100,7 @@ export default function AIResponse({ onBack, selectedStylist }) {
         <TouchableOpacity style={[styles.button, styles.primaryButton]}>
           <Text style={styles.buttonText}>Save This Look</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.outlineButton]} onPress={onBack}>
+        <TouchableOpacity style={[styles.button, styles.outlineButton]} onPress={onClose}>
           <Text style={styles.outlineButtonText}>Try Another Outfit</Text>
         </TouchableOpacity>
       </View>
@@ -97,6 +108,7 @@ export default function AIResponse({ onBack, selectedStylist }) {
     </SafeAreaView>
     </SafeAreaProvider>
   );
+}
 }
 
 const styles = StyleSheet.create({
@@ -253,5 +265,10 @@ const styles = StyleSheet.create({
   outlineButtonText: {
     color: '#333333',
     fontWeight: '600',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

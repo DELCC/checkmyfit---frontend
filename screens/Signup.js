@@ -20,7 +20,7 @@ export default function Signup({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const ipAdress = "192.168.100.144:3000";
+  const ipAdress = "192.168.100.31:3000";
 
   const handleSignup = () => {
     fetch(`http://${ipAdress}/users/signup`, {
