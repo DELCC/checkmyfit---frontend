@@ -12,7 +12,7 @@ export default function HomeScreen({ route }) {
       console.log(`les params: ${route.params}`);
     }
   }, [route.params]);
-
+  //Hello aussi
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
