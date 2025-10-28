@@ -30,7 +30,12 @@ const stylePreferencesOptions = [
 ];
 const skinTones = ["Fair", "Light", "Medium", "Tan", "Deep", "Dark"];
 
-export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
+export default function EditProfile({
+  onSave,
+  onBack,
+  isFirstTimeSetup,
+  navigation,
+}) {
   const [profileImage, setProfileImage] = useState(null);
   const [bio, setBio] = useState("Fashion enthusiast");
   const [height, setHeight] = useState("180");
@@ -46,10 +51,9 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   const [bodyOpen, setBodyOpen] = useState(false);
   const [skinOpen, setSkinOpen] = useState(false);
   const [styleOpen, setStyleOpen] = useState(false);
-  
+
   const dispatch = useDispatch();
   const user = useSelector((state) => state.users.value);
-  
 
   // Image picker
   //   const handleImagePick = () => {
@@ -66,34 +70,37 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   const handleEdit = () => {
     if (!user.token) return;
 
-    fetch(`http://192.168.100.31:3000/users/${user.token}`, {
+    fetch(`http://192.168.100.171:3000/users/${user.token}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         bio,
-        taille: height,
-        poids: weight,
-        skintone: skinTone,
-        bodytype: bodyType,
-        stylepreferences: stylePreferences,
+        height,
+        weight,
+        skinTone,
+        bodyType,
+        stylePreferences,
       }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data) {
-          dispatch(updateUser({
-            bio: data.user.bio,
-            bodytype: data.user.bodytype,
-            poids : data.user.poids,
-            skintone: data.user.skintone,
-            stylepreferences: data.user.stylepreferences,
-            taille : data.user.taille,
-            profilepic : data.user.profilepic
-          }));
+          dispatch(
+            updateUser({
+              bio: data.user.bio,
+              bodyType: data.user.bodyType,
+              weight: data.user.weight,
+              skinTone: data.user.skinTone,
+              stylePreferences: data.user.stylePreferences,
+              height: data.user.height,
+              profilePic: data.user.profilePic,
+            })
+          );
           console.log(user);
         }
       })
       .catch(() => console.log("error"));
+    navigation.navigate("Home");
   };
 
   return (
