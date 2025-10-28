@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Bell, Settings } from "lucide-react-native";
+import { Bell, Settings, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 
 export default function HomeScreen({ navigation, route }) {
@@ -18,20 +18,24 @@ export default function HomeScreen({ navigation, route }) {
     setModalVisible(false);
   };
 
+  const handleProfileScreenNavigation = () => {
+    navigation.navigate("EditProfile");
+    setModalVisible(false);
+  };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => handleCloseModal()}
-              >
-                <Bell size={20} color="#333" />
-              </TouchableOpacity>
+              <View style={styles.deleteIcon}>
+                <TouchableOpacity onPress={() => handleCloseModal()}>
+                  <X size={30} color="#000000ff" />
+                </TouchableOpacity>
+              </View>
 
-              <Text style={styles.modalText}>
+              <Text style={styles.modalTitle}>
                 Bienvenue sur Check My Fit AI 👋
               </Text>
 
@@ -41,7 +45,7 @@ export default function HomeScreen({ navigation, route }) {
               </Text>
               <TouchableOpacity
                 style={styles.modalButton}
-                onPress={() => navigation.navigate("EditProfile")}
+                onPress={() => handleProfileScreenNavigation()}
               >
                 <Text style={styles.modalButtonText}>Compléter mon profil</Text>
               </TouchableOpacity>
@@ -88,6 +92,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  deleteIcon: {
+    flexDirection: "row", // ✅ Disposition horizontale
+    justifyContent: "flex-end", // ✅ Aligner à droite
+    width: "100%",
+    marginBottom: 8,
+    paddingRight: 5,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -102,6 +113,12 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   modalText: { fontSize: 16, marginBottom: 20, textAlign: "center" },
+  modalTitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+    fontWeight: "500",
+  },
   modalButton: {
     backgroundColor: "#00A896",
     paddingHorizontal: 20,
