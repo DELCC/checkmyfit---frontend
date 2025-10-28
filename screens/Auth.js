@@ -33,7 +33,7 @@ export default function Auth({ navigation }) {
       .then((data) => {
         if (data.token) {
           dispatch(addUserToStore(data.token));
-          navigation.navigate("TabNavigator", {
+          navigation.navigate("Home", {
             isNewUser: false,
           });
           setPassword("");

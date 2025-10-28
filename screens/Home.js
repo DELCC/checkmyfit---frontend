@@ -3,8 +3,8 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Bell, Settings } from "lucide-react-native";
 import { useEffect, useState } from "react";
 
-export default function HomeScreen({ route }) {
-  const [modalVisible, setModalVisible] = useState(false);
+export default function HomeScreen({ navigation, route }) {
+  const [modalVisible, setModalVisible] = useState(true);
   //hello qsd qsd qsd sdqsdqsdqsd qsqsd
   useEffect(() => {
     if (route.params?.isNewUser) {
@@ -13,20 +13,37 @@ export default function HomeScreen({ route }) {
     }
   }, [route.params]);
 
+  const handleCloseModal = () => {
+    navigation.setParams({ isNewUser: false });
+    setModalVisible(false);
+  };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => handleCloseModal()}
+              >
+                <Bell size={20} color="#333" />
+              </TouchableOpacity>
+
               <Text style={styles.modalText}>
-                Hello 👋 Bienvenue sur Check My Fit AI !
+                Bienvenue sur Check My Fit AI 👋
+              </Text>
+
+              <Text style={styles.modalText}>
+                Renseigne ton profil pour que l'IA apprenne à connaître ton
+                style. C'est rapide, promis ! ⚡
               </Text>
               <TouchableOpacity
                 style={styles.modalButton}
-                onPress={() => setModalVisible(false)}
+                onPress={() => navigation.navigate("EditProfile")}
               >
-                <Text style={styles.modalButtonText}>Fermer</Text>
+                <Text style={styles.modalButtonText}>Compléter mon profil</Text>
               </TouchableOpacity>
             </View>
           </View>
