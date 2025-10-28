@@ -10,6 +10,8 @@ export default function HomeScreen({ navigation, route }) {
     if (route.params?.isNewUser) {
       setModalVisible(true);
       console.log(`les params: ${route.params}`);
+    } else {
+      setModalVisible(false);
     }
   }, [route.params]);
 
