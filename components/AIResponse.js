@@ -3,13 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator
 import { ArrowLeft, Sparkles, Star } from 'lucide-react-native';
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function AIResponse({onClose, selectedStylist, isLoading, picture, starRate, styleComments, improvementSuggestions }) {
-  const suggestions = [
-    'Consider a more structured blazer for a professional appearance',
-    'The color palette works well together',
-    'Add a statement accessory to elevate the look',
-    'Shoes could be more formal for the occasion',
-  ];
+export default function AIResponse({onClose, selectedStylist, isLoading, picture, starRate, styleComments, improvementSuggestions, saveOutfit }) {
+  // const suggestions = [
+  //   'Consider a more structured blazer for a professional appearance',
+  //   'The color palette works well together',
+  //   'Add a statement accessory to elevate the look',
+  //   'Shoes could be more formal for the occasion',
+  // ];
 
 if (isLoading){
 return (
@@ -102,7 +102,7 @@ return (
 
       {/* Action Buttons */}
       <View style={styles.actions}>
-        <TouchableOpacity style={[styles.button, styles.primaryButton]}>
+        <TouchableOpacity style={[styles.button, styles.primaryButton]} onPress={saveOutfit}>
           <Text style={styles.buttonText}>Save This Look</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.outlineButton]} onPress={onClose}>

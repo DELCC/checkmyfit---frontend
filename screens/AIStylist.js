@@ -94,6 +94,23 @@ export default function AIStylist() {
     setModalPhotoVisible(true);
   };
   // console.log(previewPicture);
+
+  const saveOutfit = () => {
+    fetch(`http://${IP_ADDRESS}:3000/outfits/:token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                  user: data._id ,
+                  outfitPic: req.body.outfitPic ,
+                  rating: req.body.rating,
+                  comment: req.body.comment,
+                  suggestion: req.body.suggestion,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+  })};
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -185,6 +202,7 @@ export default function AIStylist() {
               starRate={starRate}
               styleComments={styleComments}
               improvementSuggestions={improvementSuggestions}
+              saveOutfit={saveOutfit}
             />
           </Modal>
         </ScrollView>
