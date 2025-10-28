@@ -33,7 +33,11 @@ export default function Auth({ navigation }) {
       .then((data) => {
         if (data.token) {
           dispatch(addUserToStore(data.token));
-          navigation.navigate("Home");
+          navigation.navigate("TabNavigator", {
+            isNewUser: false,
+          });
+          setPassword("");
+          setUsername("");
         } else {
           console.log("incorrect password or username");
         }
@@ -68,6 +72,7 @@ export default function Auth({ navigation }) {
             style={[styles.input, styles.inputRounded]}
             placeholderTextColor="#9ca3af"
             keyboardType="email-address"
+            secureTextEntry={true}
             onChangeText={(value) => setPassword(value)}
             value={password}
           />

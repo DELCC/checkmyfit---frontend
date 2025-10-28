@@ -34,7 +34,12 @@ export default function Signup({ navigation }) {
       .then((data) => {
         if (data.token) {
           dispatch(addUserToStore(data.token));
-          navigation.navigate("Home");
+          setEmail("");
+          setPassword("");
+          setUsername("");
+          navigation.navigate("Home", {
+            isNewUser: true,
+          });
         } else {
           console.log("incorrect password or username");
         }

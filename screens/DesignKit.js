@@ -23,7 +23,7 @@ import { ClothingCard } from "../components/ClothingCard";
 import { CategoryIcon } from "../components/CategoryIcons";
 import { OutfitCard } from "../components/OutfitCard";
 
-export default function HomeScreen({ navigation }) {
+export default function DesignKit({ navigation }) {
   const colors = [
     { name: "Teal", value: "#00A6A6" },
     { name: "Mint", value: "#A8E6CF" },
