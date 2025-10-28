@@ -7,6 +7,8 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { launchImageLibrary } from "react-native-image-picker";
@@ -35,6 +37,7 @@ export default function EditProfile({
   onBack,
   isFirstTimeSetup,
   navigation,
+  route,
 }) {
   const [profileImage, setProfileImage] = useState(null);
   const [bio, setBio] = useState("Fashion enthusiast");
@@ -105,137 +108,153 @@ export default function EditProfile({
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      <ScrollView
-        nestedScrollEnabled={true}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          {!isFirstTimeSetup && onBack && (
-            <TouchableOpacity onPress={onBack} style={styles.backButton}>
-              <ArrowLeft size={24} color="#4B5563" />
-            </TouchableOpacity>
-          )}
-          <View>
-            <Text style={styles.headerTitle}>
-              {isFirstTimeSetup ? "Complete Your Profile" : "Edit Profile"}
-            </Text>
-            {isFirstTimeSetup && (
-              <Text style={styles.headerSubtitle}>
-                Help us personalize your experience
-              </Text>
+        <ScrollView
+          nestedScrollEnabled={true}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            {!route.params?.isNewUser && onBack && (
+              <TouchableOpacity onPress={onBack} style={styles.backButton}>
+                <ArrowLeft size={24} color="#4B5563" />
+              </TouchableOpacity>
             )}
-          </View>
-        </View>
-
-        {/* Profile Pic */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Profile Picture</Text>
-          <View style={styles.profileRow}>
-            <View style={styles.avatarWrapper}>
-              {profileImage ? (
-                <Image source={{ uri: profileImage }} style={styles.avatar} />
-              ) : (
-                <View style={styles.avatarPlaceholder}>
-                  <Text style={styles.avatarText}>JD</Text>
-                </View>
+            <View>
+              <Text style={styles.headerTitle}>
+                {route.params?.isNewUser
+                  ? "Complete Your Profile"
+                  : "Edit Profile"}
+              </Text>
+              {route.params?.isNewUser && (
+                <Text style={styles.headerSubtitle}>
+                  Help us personalize your experience
+                </Text>
               )}
             </View>
-            <View style={{ flex: 1 }}>
-              <TouchableOpacity
-                style={styles.uploadButton} /*onPress={handleImagePick}*/
-              >
-                <Camera size={18} color="white" style={{ marginRight: 6 }} />
-                <Text style={styles.uploadButtonText}>Upload Photo</Text>
-              </TouchableOpacity>
-              <Text style={styles.helperText}>JPG, PNG up to 5MB</Text>
+          </View>
+
+          {/* Profile Pic */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Profile Picture</Text>
+            <View style={styles.profileRow}>
+              <View style={styles.avatarWrapper}>
+                {profileImage ? (
+                  <Image source={{ uri: profileImage }} style={styles.avatar} />
+                ) : (
+                  <View style={styles.avatarPlaceholder}>
+                    <Text style={styles.avatarText}>JD</Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ flex: 1 }}>
+                <TouchableOpacity
+                  style={styles.uploadButton} /*onPress={handleImagePick}*/
+                >
+                  <Camera size={18} color="white" style={{ marginRight: 6 }} />
+                  <Text style={styles.uploadButtonText}>Upload Photo</Text>
+                </TouchableOpacity>
+                <Text style={styles.helperText}>JPG, PNG up to 5MB</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Bio */}
-        <Text style={styles.label}>Bio</Text>
-        <TextInput
-          style={styles.textarea}
-          value={bio}
-          onChangeText={setBio}
-          placeholder="Tell us about your style..."
-          multiline
-          numberOfLines={3}
-        />
+          <View style={styles.editSection}>
+            {/* Bio */}
+            <Text style={styles.label}>Bio</Text>
+            <TextInput
+              style={styles.input}
+              value={bio}
+              onChangeText={setBio}
+              placeholder="Tell us about your style..."
+              multiline
+              numberOfLines={3}
+            />
 
-        {/* Height */}
-        <Text style={styles.label}>Height</Text>
-        <TextInput
-          style={styles.input}
-          value={height}
-          onChangeText={setHeight}
-          placeholder="180"
-        />
+            {/* Height */}
+            <Text style={styles.label}>Height (cm)</Text>
+            <TextInput
+              style={styles.input}
+              value={height}
+              onChangeText={setHeight}
+              placeholder="180"
+            />
 
-        {/* Weight */}
-        <Text style={styles.label}>Weight (lbs)</Text>
-        <TextInput
-          style={styles.input}
-          value={weight}
-          onChangeText={setWeight}
-          placeholder="80"
-          keyboardType="numeric"
-        />
+            {/* Weight */}
+            <Text style={styles.label}>Weight (kg)</Text>
+            <TextInput
+              style={styles.input}
+              value={weight}
+              onChangeText={setWeight}
+              placeholder="80"
+              keyboardType="numeric"
+            />
 
-        {/* Skintone */}
-        <Text style={styles.label}>Skin Tone</Text>
-        <DropDownPicker
-          open={skinOpen}
-          value={skinTone}
-          items={skinTones.map((tone) => ({ label: tone, value: tone }))}
-          setOpen={setSkinOpen}
-          setValue={setSkinTone}
-          containerStyle={{ marginBottom: 16 }}
-          dropDownContainerStyle={{ maxHeight: 150 }}
-          zIndex={3000}
-        />
+            {/* Skintone */}
+            <Text style={styles.label}>Skin Tone</Text>
+            <DropDownPicker
+              style={styles.input}
+              open={skinOpen}
+              value={skinTone}
+              items={skinTones.map((tone) => ({ label: tone, value: tone }))}
+              setOpen={setSkinOpen}
+              setValue={setSkinTone}
+              containerStyle={{ marginBottom: 16 }}
+              dropDownContainerStyle={{ maxHeight: 150 }}
+              zIndex={3000}
+              dropDownDirection="BOTTOM"
+              listMode="SCROLLVIEW"
+            />
 
-        {/* Bodytype */}
-        <Text style={styles.label}>Body Type</Text>
-        <DropDownPicker
-          open={bodyOpen}
-          value={bodyType}
-          items={bodyTypes.map((type) => ({ label: type, value: type }))}
-          setOpen={setBodyOpen}
-          setValue={setBodyType}
-          containerStyle={{ marginBottom: 16 }}
-          dropDownContainerStyle={{ maxHeight: 150 }}
-          zIndex={2000}
-        />
+            {/* Bodytype */}
+            <Text style={styles.label}>Body Type</Text>
+            <DropDownPicker
+              style={styles.input}
+              open={bodyOpen}
+              value={bodyType}
+              items={bodyTypes.map((type) => ({ label: type, value: type }))}
+              setOpen={setBodyOpen}
+              setValue={setBodyType}
+              containerStyle={{ marginBottom: 16 }}
+              dropDownContainerStyle={{ maxHeight: 150 }}
+              zIndex={2000}
+              dropDownDirection="BOTTOM"
+              listMode="SCROLLVIEW"
+            />
 
-        {/* Style pref */}
-        <Text style={styles.label}>Style Preferences</Text>
-        <DropDownPicker
-          multiple={true}
-          min={0}
-          max={stylePreferencesOptions.length}
-          open={styleOpen}
-          value={stylePreferences}
-          items={stylePreferencesOptions.map((style) => ({
-            label: style,
-            value: style,
-          }))}
-          setOpen={setStyleOpen}
-          setValue={setStylePreferences}
-          containerStyle={{ marginBottom: 16 }}
-          dropDownContainerStyle={{ maxHeight: 150 }}
-          zIndex={1000}
-        />
-
-        {/* Save Btn */}
-        <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
-          <Text style={styles.saveButtonText}>
-            {isFirstTimeSetup ? "Complete Setup" : "Save Changes"}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
+            {/* Style pref */}
+            <Text style={styles.label}>Style Preferences</Text>
+            <DropDownPicker
+              style={styles.input}
+              multiple={true}
+              min={0}
+              max={stylePreferencesOptions.length}
+              open={styleOpen}
+              value={stylePreferences}
+              items={stylePreferencesOptions.map((style) => ({
+                label: style,
+                value: style,
+              }))}
+              setOpen={setStyleOpen}
+              setValue={setStylePreferences}
+              containerStyle={{ marginBottom: 16 }}
+              dropDownContainerStyle={{ maxHeight: 150 }}
+              zIndex={1000}
+              dropDownDirection="BOTTOM"
+              listMode="SCROLLVIEW"
+            />
+          </View>
+          {/* Save Btn */}
+          <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
+            <Text style={styles.saveButtonText}>
+              {route.params?.isNewUser ? "Complete Setup" : "Save Changes"}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -247,39 +266,52 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 250,
+    position: "relative",
   },
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
   },
   backButton: {
     marginRight: 16,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#111827",
+    fontSize: 14,
+    color: "#6b7280",
   },
   headerSubtitle: {
     color: "#6B7280",
     fontSize: 14,
   },
+  editSection: {
+    flex: 1,
+    justifyContent: "center",
+  },
   section: {
+    padding: 10,
     marginBottom: 24,
   },
   label: {
     fontWeight: "bold",
     marginBottom: 8,
     color: "#111827",
+    padding: 10,
   },
   input: {
-    backgroundColor: "white",
-    padding: 12,
+    height: 44,
+    width: "90%",
+    backgroundColor: "#f3f4f6",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 8,
-    marginBottom: 16,
+    borderColor: "#d1d5db",
+    paddingHorizontal: 12,
+    color: "#111827",
+    fontSize: 16,
+    borderRadius: 12,
   },
   textarea: {
     backgroundColor: "white",

@@ -1,138 +1,179 @@
-import { View, Text, TouchableOpacity, StyleSheet ,TextInput, ScrollView, Modal, Image} from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  Modal,
+  Image,
+} from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import CameraViewStyle from "../components/CameraViewStyle";
 import AIResponse from "../components/AIResponse";
-
+// Hello il est 15h06
 export default function AIStylist() {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
   const [modalResultVisible, setModalResultVisible] = useState(false);
-  const [ previewPicture, setPreviewPicture] = useState('');
-  const [ promptInput, setPromptInput] = useState('');
-  const [analysis, setAnalysis] = useState('');
+  const [previewPicture, setPreviewPicture] = useState("");
+  const [promptInput, setPromptInput] = useState("");
+  const [analysis, setAnalysis] = useState("");
   const formData = new FormData();
 
-  const IP_ADDRESS='192.168.100.31';
+  const IP_ADDRESS = "192.168.100.171";
 
   const selectedStylist = {
-    initials : 'CD',
-    name : 'Clément Delcourt',
-    tagline : 'Fashion Enthousiasm'
+    initials: "CD",
+    name: "Clément Delcourt",
+    tagline: "Fashion Enthousiasm",
   };
-  
+
   const showPreviewPicture = (photo) => {
     setPreviewPicture(photo.uri);
     console.log(photo.uri);
   };
-  
+
   const onSubmit = () => {
-          setIsLoading(true);
-          formData.append('photoFromFront', {
-          uri: previewPicture,
-          name: 'photo.jpg',
-          type: 'image/jpeg',
-          });
-       fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
-          method: 'POST',
-          body: formData,
-          }).then((response) => response.json())
-          .then((data) =>{
-            if (data.result) {
-              fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`,{
-                method: 'POST',
-                headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
+    setIsLoading(true);
+    formData.append("photoFromFront", {
+      uri: previewPicture,
+      name: "photo.jpg",
+      type: "image/jpeg",
+    });
+    fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
               picture: data.url,
-               prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
-              })
-              }).then(response => response.json())
-              .then(data => {
-                // setAnalysis(data.analysis.data.responses);
-                 console.log(data.data.data.analysis.responses);
-                 setIsLoading(false);
-                })
-                .catch(error => console.log(error));
-            }
-            setModalResultVisible(true);
-});
-
-};
-
+              //  prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
+              prompts: [
+                "Rate my Style",
+                'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
+              ],
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // setAnalysis(data.analysis.data.responses);
+              console.log(data.data.data.analysis.responses);
+              setIsLoading(false);
+            });
+        }
+        setModalResultVisible(true);
+      });
+  };
 
   const handleTakePhoto = () => {
     setModalPhotoVisible(true);
   };
-console.log(previewPicture);
+  console.log(previewPicture);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          <Sparkles size={32} color="#fff" />
-        </View>
-        <Text style={styles.title}>Upload or Capture Your Look</Text>
-        <Text style={styles.subtitle}>Get AI feedback on your style</Text>
-      </View>
-
-      {/* Camera Preview */}
-      <View style={styles.previewContainer}>
-        {previewPicture? (<View style={styles.previewBox}>
-              <Image source={{
-          uri: previewPicture,
-        }} 
-        style={styles.previewImage}
-        resizeMode="cover" />
-        </View>) : (<View style={styles.previewBox}>
-          <View style={styles.previewIconContainer}>
-            <CameraIcon size={48} color="#999" />
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.iconContainer}>
+              <Sparkles size={32} color="#fff" />
+            </View>
+            <Text style={styles.title}>Upload or Capture Your Look</Text>
+            <Text style={styles.subtitle}>Get AI feedback on your style</Text>
           </View>
-          <Text style={styles.previewText}>Camera Preview</Text>
-        </View>)}
-      </View>
 
-      {/* Take Picture Button */}
-      <TouchableOpacity style={[styles.button, styles.cameraButton]} onPress={() => handleTakePhoto()}>
-        <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
-        <Text style={styles.buttonText}>Take Picture</Text>
-      </TouchableOpacity>
+          {/* Camera Preview */}
+          <View style={styles.previewContainer}>
+            {previewPicture ? (
+              <View style={styles.previewBox}>
+                <Image
+                  source={{
+                    uri: previewPicture,
+                  }}
+                  style={styles.previewImage}
+                  resizeMode="cover"
+                />
+              </View>
+            ) : (
+              <View style={styles.previewBox}>
+                <View style={styles.previewIconContainer}>
+                  <CameraIcon size={48} color="#999" />
+                </View>
+                <Text style={styles.previewText}>Camera Preview</Text>
+              </View>
+            )}
+          </View>
 
-      {/* Message Input */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Add a message (optional)</Text>
-        <TextInput
-          style={styles.textarea}
-          placeholder="e.g., 'Here's my look for a job interview — is it OK?'"
-          placeholderTextColor="#999"
-          multiline
-          onChangeText={(value) => setPromptInput(value)}
-          value={promptInput}
-        />
-      </View>
+          {/* Take Picture Button */}
+          <TouchableOpacity
+            style={[styles.button, styles.cameraButton]}
+            onPress={() => handleTakePhoto()}
+          >
+            <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Take Picture</Text>
+          </TouchableOpacity>
 
-      {/* Submit Button */}
-      <TouchableOpacity onPress={() => onSubmit()} style={[styles.button, styles.submitButton]}>
-        <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-        <Text style={styles.buttonText}>Submit for AI Review</Text>
-      </TouchableOpacity>
-       <Modal visible={modalPhotoVisible} animationType="slide" transparent={false}>
-        <CameraViewStyle onClose={() => setModalPhotoVisible(false)} showPreviewPicture={showPreviewPicture} />
-      </Modal>
-      <Modal visible={modalResultVisible} animationType="slide" transparent={false}>
-        <AIResponse onClose={() => setModalResultVisible(false)} selectedStylist={selectedStylist} isLoading={isLoading} />
-      </Modal>
-    </ScrollView>
-        </SafeAreaView>
-        </SafeAreaProvider>);
+          {/* Message Input */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Add a message (optional)</Text>
+            <TextInput
+              style={styles.textarea}
+              placeholder="e.g., 'Here's my look for a job interview — is it OK?'"
+              placeholderTextColor="#999"
+              multiline
+              onChangeText={(value) => setPromptInput(value)}
+              value={promptInput}
+            />
+          </View>
 
-  }
+          {/* Submit Button */}
+          <TouchableOpacity
+            onPress={() => onSubmit()}
+            style={[styles.button, styles.submitButton]}
+          >
+            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Submit for AI Review</Text>
+          </TouchableOpacity>
+          <Modal
+            visible={modalPhotoVisible}
+            animationType="slide"
+            transparent={false}
+          >
+            <CameraViewStyle
+              onClose={() => setModalPhotoVisible(false)}
+              showPreviewPicture={showPreviewPicture}
+            />
+          </Modal>
+          <Modal
+            visible={modalResultVisible}
+            animationType="slide"
+            transparent={false}
+          >
+            <AIResponse
+              onClose={() => setModalResultVisible(false)}
+              selectedStylist={selectedStylist}
+              isLoading={isLoading}
+            />
+          </Modal>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+}
 
-  const styles = StyleSheet.create({
-
-    container: {
+const styles = StyleSheet.create({
+  container: {
     flex: 1,
     backgroundColor: "#FAFAFA", // équiv. var(--off-white)
   },
@@ -238,8 +279,8 @@ console.log(previewPicture);
     textAlignVertical: "top",
   },
   previewImage: {
-  width: "100%",
-  height: "100%",
-  borderRadius: 16,
-},
+    width: "100%",
+    height: "100%",
+    borderRadius: 16,
+  },
 });

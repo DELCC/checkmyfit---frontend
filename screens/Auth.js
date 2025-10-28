@@ -16,6 +16,8 @@ import { Sparkles } from "lucide-react-native";
 export default function Auth({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUsernameError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -38,8 +40,12 @@ export default function Auth({ navigation }) {
           });
           setPassword("");
           setUsername("");
+          setUsernameError(false);
+          setPasswordError(false);
         } else {
           console.log("incorrect password or username");
+          setUsernameError(true);
+          setPasswordError(true);
         }
       });
   };
@@ -59,7 +65,9 @@ export default function Auth({ navigation }) {
             placeholder="Username"
             style={[styles.input, styles.inputRounded]}
             placeholderTextColor="#9ca3af"
-            keyboardType="email-address"
+            keyboardType="default"
+            autoCapitalize="none"
+            autoCorrect={false}
             onChangeText={(value) => setUsername(value)}
             value={username}
           />
@@ -71,12 +79,21 @@ export default function Auth({ navigation }) {
             placeholder="Enter your password"
             style={[styles.input, styles.inputRounded]}
             placeholderTextColor="#9ca3af"
-            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
             secureTextEntry={true}
             onChangeText={(value) => setPassword(value)}
             value={password}
           />
         </View>
+
+        {usernameError && passwordError && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
+              Nom d’utilisateur ou mot de passe incorrect. Veuillez réessayer.
+            </Text>
+          </View>
+        )}
 
         <TouchableOpacity
           style={[styles.button, styles.primaryButton]}
@@ -101,7 +118,7 @@ export default function Auth({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: "#f9fafb",
     justifyContent: "center",
     padding: 40,
@@ -165,5 +182,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#00A6A6",
     textDecorationLine: "underline",
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FDECEC",
+    borderLeftWidth: 4,
+    borderLeftColor: "#D9534F",
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: "#A94442",
+    fontSize: 14,
+    flex: 1,
+    fontWeight: "500",
   },
 });
