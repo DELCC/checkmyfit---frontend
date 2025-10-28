@@ -13,7 +13,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import users from "./reducers/users";
-import profile from "./reducers/profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

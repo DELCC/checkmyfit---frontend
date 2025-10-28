@@ -64,7 +64,7 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   //   };
 
   const handleEdit = () => {
-    if (!!user.token) return;
+    if (!user.token) return;
 
     fetch(`http://192.168.100.171:3000/users/${user.token}`, {
       method: "PUT",
