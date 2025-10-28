@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/users";
 
 const Stack = createNativeStackNavigator();
-
+//g
 export default function Profile({ navigation }) {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.users.value.token);
