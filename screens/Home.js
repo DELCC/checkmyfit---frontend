@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function HomeScreen({ route }) {
   const [modalVisible, setModalVisible] = useState(false);
-  //hello qsd
+  //hello qsd qsd
   useEffect(() => {
     if (route.params?.isNewUser) {
       setModalVisible(true);
