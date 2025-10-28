@@ -3,15 +3,23 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import CameraViewStyle from "../components/CameraViewStyle";
+import AIResponse from "../components/AIResponse";
 
 export default function AIStylist() {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
+  const [modalResultVisible, setModalResultVisible] = useState(false);
   const [ previewPicture, setPreviewPicture] = useState('');
   const [ promptInput, setPromptInput] = useState('');
   const [analysis, setAnalysis] = useState('');
   const formData = new FormData();
 
   const IP_ADDRESS='192.168.100.31';
+
+  const selectedStylist = {
+    initials : 'CD',
+    name : 'Clément Delcourt',
+    tagline : 'Fashion Enthousiasm'
+  };
   
   const showPreviewPicture = (photo) => {
     setPreviewPicture(photo.uri);
@@ -43,6 +51,7 @@ export default function AIStylist() {
                  console.log(data.data.data.analysis.responses);
                 });
             }
+            setModalResultVisible(true);
 });
 
 };
@@ -50,7 +59,7 @@ export default function AIStylist() {
 
 
   const handleTakePhoto = () => {
-    setModalVisible(true);
+    setModalPhotoVisible(true);
   };
 console.log(previewPicture);
   return (
@@ -106,8 +115,11 @@ console.log(previewPicture);
         <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
         <Text style={styles.buttonText}>Submit for AI Review</Text>
       </TouchableOpacity>
-       <Modal visible={modalVisible} animationType="slide" transparent={false}>
-        <CameraViewStyle onClose={() => setModalVisible(false)} showPreviewPicture={showPreviewPicture} />
+       <Modal visible={modalPhotoVisible} animationType="slide" transparent={false}>
+        <CameraViewStyle onClose={() => setModalPhotoVisible(false)} showPreviewPicture={showPreviewPicture} />
+      </Modal>
+      <Modal visible={modalResultVisible} animationType="slide" transparent={false}>
+        <AIResponse onClose={() => setModalPhotoVisible(false)} selectedStylist={selectedStylist} />
       </Modal>
     </ScrollView>
         </SafeAreaView>

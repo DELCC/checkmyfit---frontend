@@ -91,7 +91,7 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
               profilePic: data.user.profilePic,
             })
           );
-          console.log(user);
+          console.log(data);
         }
       })
       .catch(() => console.log("error"));
