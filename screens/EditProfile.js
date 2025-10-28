@@ -30,7 +30,12 @@ const stylePreferencesOptions = [
 ];
 const skinTones = ["Fair", "Light", "Medium", "Tan", "Deep", "Dark"];
 
-export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
+export default function EditProfile({
+  onSave,
+  onBack,
+  isFirstTimeSetup,
+  navigation,
+}) {
   const [profileImage, setProfileImage] = useState(null);
   const [bio, setBio] = useState("Fashion enthusiast");
   const [height, setHeight] = useState("180");
@@ -65,7 +70,7 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
   const handleEdit = () => {
     if (!user.token) return;
 
-    fetch(`http://192.168.100.31:3000/users/${user.token}`, {
+    fetch(`http://192.168.100.171:3000/users/${user.token}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -95,6 +100,7 @@ export default function EditProfile({ onSave, onBack, isFirstTimeSetup }) {
         }
       })
       .catch(() => console.log("error"));
+    navigation.navigate("Home");
   };
 
   return (
