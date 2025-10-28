@@ -22,7 +22,7 @@ export default function Signup({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const ipAdress = "192.168.100.144:3000";
+  const ipAdress = "192.168.100.31:3000";
 
   const EMAIL_REGEX =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
