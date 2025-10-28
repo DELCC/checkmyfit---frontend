@@ -1,4 +1,4 @@
-import HomeScreen from "./screens/HomeScreen";
+import DesignKit from "./screens/DesignKit";
 import AIStylist from "./screens/AIStylist";
 import Wardrobe from "./screens/Wardrobe";
 import Profile from "./screens/Profile";
@@ -6,6 +6,7 @@ import Profiles from "./screens/Profiles";
 import Auth from "./screens/Auth";
 import Signup from "./screens/Signup";
 import EditProfile from "./screens/EditProfile";
+import HomeScreen from "./screens/Home";
 import { Home, ShoppingBag, Camera, Users, User } from "lucide-react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -22,7 +23,8 @@ const store = configureStore({
 });
 
 export default function App() {
-  function TabNavigator() {
+  function TabNavigator({ route }) {
+    const tabParams = route?.params || {};
     return (
       <Tab.Navigator
         screenOptions={{
@@ -32,8 +34,9 @@ export default function App() {
         }}
       >
         <Tab.Screen
-          name="Home"
+          name="HomeScreen"
           component={HomeScreen}
+          initialParams={tabParams}
           options={{
             tabBarIcon: () => <Home color="#00A6A6" size={28} />, // couleur et taille fixes
           }}
@@ -53,8 +56,8 @@ export default function App() {
           }}
         />
         <Tab.Screen
-          name="Profiles"
-          component={Profiles}
+          name="DesignKit"
+          component={DesignKit}
           options={{
             tabBarIcon: () => <Users color="#20B2AA" size={30} />,
           }}
@@ -74,9 +77,9 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen name="Auth" component={Auth} />
           <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen name="Home" component={TabNavigator} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
         </Stack.Navigator>
       </NavigationContainer>
