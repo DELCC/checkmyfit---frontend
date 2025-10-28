@@ -1,0 +1,286 @@
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  Modal,
+  Image,
+} from "react-native";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
+import { useState } from "react";
+import AIResponse from "../components/AIResponse";
+import CameraViewStyleItem from "../components/CameraViewStyleItem";
+
+export default function addItem({ navigation }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
+  const [modalResultVisible, setModalResultVisible] = useState(false);
+  const [previewPicture, setPreviewPicture] = useState("");
+  const [promptInput, setPromptInput] = useState("");
+  const [analysis, setAnalysis] = useState("");
+  const formData = new FormData();
+
+  const IP_ADDRESS = "192.168.100.171";
+
+  const selectedStylist = {
+    initials: "CD",
+    name: "Clément Delcourt",
+    tagline: "Fashion Enthousiasm",
+  };
+
+  // Inverse Data Flow - get photo uri from CameraViewStyleItem.js
+  const showPreviewPicture = (photo) => {
+    setPreviewPicture(photo.uri);
+    console.log(photo.uri);
+  };
+
+  // Send the item in DB - TO BE CHANGED
+  const onSubmit = () => {
+    setIsLoading(true);
+    formData.append("photoFromFront", {
+      uri: previewPicture,
+      name: "photo.jpg",
+      type: "image/jpeg",
+    });
+    fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              picture: data.url,
+              //  prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
+              prompts: [
+                "Rate my Style",
+                'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
+              ],
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // setAnalysis(data.analysis.data.responses);
+              console.log(data.data.data.analysis.responses);
+              setIsLoading(false);
+            });
+        }
+        setModalResultVisible(true);
+      });
+  };
+
+  // Show Modal for picture
+  const handleTakePhoto = () => {
+    setModalPhotoVisible(true);
+  };
+  console.log(previewPicture);
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.iconContainer}>
+              <Sparkles size={32} color="#fff" />
+            </View>
+            <Text style={styles.title}>Add item to your virtual dressing</Text>
+          </View>
+
+          {/* Camera Preview */}
+          <View style={styles.previewContainer}>
+            {previewPicture ? (
+              <View style={styles.previewBox}>
+                <Image
+                  source={{
+                    uri: previewPicture,
+                  }}
+                  style={styles.previewImage}
+                  resizeMode="cover"
+                />
+              </View>
+            ) : (
+              <View style={styles.previewBox}>
+                <View style={styles.previewIconContainer}>
+                  <CameraIcon size={48} color="#999" />
+                </View>
+                <Text style={styles.previewText}>Camera Preview</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Take Picture Button */}
+          <TouchableOpacity
+            style={[styles.button, styles.cameraButton]}
+            onPress={() => handleTakePhoto()}
+          >
+            <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Take Picture</Text>
+          </TouchableOpacity>
+
+          {/* Submit Button */}
+          <TouchableOpacity
+            onPress={() => onSubmit()}
+            style={[styles.button, styles.submitButton]}
+          >
+            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Add item</Text>
+          </TouchableOpacity>
+
+          {/* Navigate to Home */}
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Home")}
+            style={[styles.button, styles.submitButton]}
+          >
+            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Go back Home</Text>
+          </TouchableOpacity>
+
+          <Modal
+            visible={modalPhotoVisible}
+            animationType="slide"
+            transparent={false}
+          >
+            <CameraViewStyleItem
+              onClose={() => setModalPhotoVisible(false)}
+              showPreviewPicture={showPreviewPicture}
+            />
+          </Modal>
+          <Modal
+            visible={modalResultVisible}
+            animationType="slide"
+            transparent={false}
+          >
+            <AIResponse
+              onClose={() => setModalResultVisible(false)}
+              selectedStylist={selectedStylist}
+              isLoading={isLoading}
+            />
+          </Modal>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA", // équiv. var(--off-white)
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingTop: 48,
+    paddingBottom: 96,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: "#6C63FF", // équiv. var(--gradient-ai)
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+    elevation: 4,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#222", // équiv. var(--soft-black)
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#666", // équiv. var(--cool-gray)
+  },
+  previewContainer: {
+    marginBottom: 32,
+  },
+  previewBox: {
+    aspectRatio: 3 / 4,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "#CCC", // équiv. var(--border-gray)
+    backgroundColor: "#EEE", // équiv. var(--light-gray)
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+  },
+  previewIconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 16,
+    backgroundColor: "#F6F6F6", // équiv. var(--gradient-soft)
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+    elevation: 2,
+  },
+  previewText: {
+    color: "#888",
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cameraButton: {
+    backgroundColor: "#4A90E2", // équiv. var(--gradient-primary)
+  },
+  submitButton: {
+    backgroundColor: "#6C63FF", // équiv. var(--gradient-ai)
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  inputGroup: {
+    marginBottom: 32,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 8,
+  },
+  textarea: {
+    minHeight: 120,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#DDD",
+    padding: 12,
+    textAlignVertical: "top",
+  },
+  previewImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 16,
+  },
+});
