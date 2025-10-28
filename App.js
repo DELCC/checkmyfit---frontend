@@ -23,7 +23,8 @@ const store = configureStore({
 });
 
 export default function App() {
-  function TabNavigator() {
+  function TabNavigator({ route }) {
+    const tabParams = route?.params || {};
     return (
       <Tab.Navigator
         screenOptions={{
@@ -33,8 +34,9 @@ export default function App() {
         }}
       >
         <Tab.Screen
-          name="Home"
+          name="HomeScreen"
           component={HomeScreen}
+          initialParams={tabParams}
           options={{
             tabBarIcon: () => <Home color="#00A6A6" size={28} />, // couleur et taille fixes
           }}

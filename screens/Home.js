@@ -3,15 +3,20 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Bell, Settings } from "lucide-react-native";
 import { useEffect, useState } from "react";
 
-export default function HomeScreen({ navigation, route }) {
+export default function HomeScreen({ route }) {
   const [modalVisible, setModalVisible] = useState(false);
 
-  console.log(`les params: ${route.params}`);
+  useEffect(() => {
+    if (route.params?.isNewUser) {
+      setModalVisible(true);
+      console.log(`les params: ${route.params}`);
+    }
+  }, [route.params]);
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <Modal visible={modalVisible} animationType="slide" transparent={false}>
+        <Modal visible={modalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalText}>
