@@ -13,7 +13,7 @@ import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import CameraViewStyle from "../components/CameraViewStyle";
 import AIResponse from "../components/AIResponse";
-
+// Hello il est 15h06
 export default function AIStylist() {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
