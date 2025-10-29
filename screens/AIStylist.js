@@ -15,10 +15,14 @@ import CameraViewStyle from "../components/CameraViewStyle";
 import AIResponse from "../components/AIResponse";
 import { useSelector, useDispatch } from "react-redux";
 import { addOutfit } from "../reducers/users";
+
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+
 export default function AIStylist() {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
-  const [modalResultVisible, setModalResultVisible] = useState(false);
+  // const [modalResultVisible, setModalResultVisible] = useState(false);
   const [previewPicture, setPreviewPicture] = useState("");
   const [picture, setPicture] = useState("");
   const [promptInput, setPromptInput] = useState("");
@@ -26,10 +30,13 @@ export default function AIStylist() {
   const [styleComments, setStyleComments] = useState("");
 
   const [improvementSuggestions, setImprovementSuggestions] = useState("");
-
   const formData = new FormData();
 
+<<<<<<< HEAD
   const IP_ADDRESS = "192.168.100.144";
+=======
+  // const IP_ADDRESS = "192.168.100.144";
+>>>>>>> aab61720856516caa628080f62c0f302e58f63a4
 
   const selectedStylist = {
     initials: "CD",
@@ -49,7 +56,7 @@ export default function AIStylist() {
       name: "photo.jpg",
       type: "image/jpeg",
     });
-    fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
+    fetch(`${API_IP}:${API_PORT}/pictures/upload`, {
       method: "POST",
       body: formData,
     })
@@ -58,7 +65,7 @@ export default function AIStylist() {
         if (data.result) {
           console.log(data.url);
           setPicture(data.url);
-          fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`, {
+          fetch(`${API_IP}:${API_PORT}/pictures/aianalysis`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -78,7 +85,7 @@ export default function AIStylist() {
               const stringValue = rawResponse[0].value;
               console.log(stringValue);
               const AIResultObject = JSON.parse(stringValue);
-
+              // const AIResultObject = JSON.parse(stringValue);
               console.log(AIResultObject);
               console.log(AIResultObject.suggestions);
               setIsLoading(false);
@@ -87,6 +94,7 @@ export default function AIStylist() {
               setImprovementSuggestions(AIResultObject.suggestions);
             })
             .catch((error) => console.log(error));
+          // .catch((error) => console.log(error));
         }
         setModalResultVisible(true);
       });
@@ -101,7 +109,7 @@ export default function AIStylist() {
   const user = useSelector((state) => state.users.value);
 
   const saveOutfit = () => {
-    fetch(`http://${IP_ADDRESS}:3000/outfits/${user.token}`, {
+    fetch(`${API_IP}:${API_PORT}/outfits/${user.token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -5,6 +5,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/users";
 
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+
 const Stack = createNativeStackNavigator();
 //gghqsv qqsdqs qsd
 export default function Profile({ navigation }) {

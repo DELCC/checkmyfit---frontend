@@ -11,7 +11,9 @@ export default function CameraViewStyleItem({ onClose, getCloudinaryData }) {
 
   const cameraRef = useRef(null);
 
-  const IP_ADDRESS = "192.168.100.144:3000";
+  const API_IP = process.env.EXPO_PUBLIC_API_IP;
+  const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+  // const IP_ADDRESS = "192.168.100.144:3000";
 
   // Take a picture and get image without background from Cloudinary
 
@@ -25,7 +27,7 @@ export default function CameraViewStyleItem({ onClose, getCloudinaryData }) {
         name: "photo.jpg",
         type: "image/jpeg",
       });
-      fetch(`http://${IP_ADDRESS}/items/upload`, {
+      fetch(`${API_IP}:${API_PORT}/items/upload`, {
         method: "POST",
         body: formData,
       })

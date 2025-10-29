@@ -14,6 +14,9 @@ import { useState, useEffect } from "react";
 import AIResponse from "../components/AIResponse";
 import CameraViewStyleItem from "../components/CameraViewStyleItem";
 
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+
 export default function addItem({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
@@ -21,7 +24,7 @@ export default function addItem({ navigation }) {
   const [cloudinaryUrl, setCloudinaryUrl] = useState("");
   const [cloudinaryPublicId, setCloudinaryPublicId] = useState("");
 
-  const IP_ADDRESS = "192.168.100.144";
+  // const IP_ADDRESS = "192.168.100.144";
 
   const selectedStylist = {
     initials: "CD",
@@ -38,7 +41,7 @@ export default function addItem({ navigation }) {
 
   const handleRemoveBackground = () => {
     if (cloudinaryUrl && cloudinaryPublicId) {
-      fetch(`http://${IP_ADDRESS}:3000/items/removeBackground`, {
+      fetch(`${API_IP}:${API_PORT}/items/removeBackground`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
