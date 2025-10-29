@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AIResponse from "../components/AIResponse";
 import CameraViewStyleItem from "../components/CameraViewStyleItem";
 
@@ -18,12 +18,10 @@ export default function addItem({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
   const [modalResultVisible, setModalResultVisible] = useState(false);
-  const [previewPicture, setPreviewPicture] = useState("");
-  const [promptInput, setPromptInput] = useState("");
-  const [analysis, setAnalysis] = useState("");
-  const formData = new FormData();
+  const [cloudinaryUrl, setCloudinaryUrl] = useState("");
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState("");
 
-  const IP_ADDRESS = "192.168.100.171";
+  const IP_ADDRESS = "192.168.100.144";
 
   const selectedStylist = {
     initials: "CD",
@@ -31,55 +29,36 @@ export default function addItem({ navigation }) {
     tagline: "Fashion Enthousiasm",
   };
 
-  // Inverse Data Flow - get photo uri from CameraViewStyleItem.js
-  const showPreviewPicture = (photo) => {
-    setPreviewPicture(photo.uri);
-    console.log(photo.uri);
+  // Inverse Data Flow - get Cloudinary URL from CameraViewStyleItem.js
+  const getCloudinaryData = (url, publicId) => {
+    setCloudinaryUrl(url);
+    setCloudinaryPublicId(publicId);
   };
+  console.log(`Id dispo dans addItem ${cloudinaryPublicId}`);
 
-  // Send the item in DB - TO BE CHANGED
-  const onSubmit = () => {
-    setIsLoading(true);
-    formData.append("photoFromFront", {
-      uri: previewPicture,
-      name: "photo.jpg",
-      type: "image/jpeg",
-    });
-    fetch(`http://${IP_ADDRESS}:3000/pictures/upload`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          fetch(`http://${IP_ADDRESS}:3000/pictures/aianalysis`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              picture: data.url,
-              //  prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
-              prompts: [
-                "Rate my Style",
-                'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
-              ],
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              // setAnalysis(data.analysis.data.responses);
-              console.log(data.data.data.analysis.responses);
-              setIsLoading(false);
-            });
-        }
-        setModalResultVisible(true);
-      });
+  const handleRemoveBackground = () => {
+    if (cloudinaryUrl && cloudinaryPublicId) {
+      fetch(`http://${IP_ADDRESS}:3000/items/removeBackground`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cloudinaryPublicId }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setCloudinaryUrl(data.transformedUrl);
+          console.log(data.transformedUrl);
+        });
+    } else {
+      console.log("error : issue with image transformation");
+    }
   };
 
   // Show Modal for picture
   const handleTakePhoto = () => {
     setModalPhotoVisible(true);
   };
-  console.log(previewPicture);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -97,11 +76,11 @@ export default function addItem({ navigation }) {
 
           {/* Camera Preview */}
           <View style={styles.previewContainer}>
-            {previewPicture ? (
+            {cloudinaryUrl ? (
               <View style={styles.previewBox}>
                 <Image
                   source={{
-                    uri: previewPicture,
+                    uri: cloudinaryUrl,
                   }}
                   style={styles.previewImage}
                   resizeMode="cover"
@@ -126,13 +105,13 @@ export default function addItem({ navigation }) {
             <Text style={styles.buttonText}>Take Picture</Text>
           </TouchableOpacity>
 
-          {/* Submit Button */}
+          {/* Remove Background with AI Button */}
           <TouchableOpacity
-            onPress={() => onSubmit()}
+            onPress={() => handleRemoveBackground()}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Add item</Text>
+            <Text style={styles.buttonText}>Remove background with AI</Text>
           </TouchableOpacity>
 
           {/* Navigate to Home */}
@@ -152,7 +131,7 @@ export default function addItem({ navigation }) {
           >
             <CameraViewStyleItem
               onClose={() => setModalPhotoVisible(false)}
-              showPreviewPicture={showPreviewPicture}
+              getCloudinaryData={getCloudinaryData}
             />
           </Modal>
           <Modal

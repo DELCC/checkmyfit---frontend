@@ -21,7 +21,7 @@ export default function Auth({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const ipAdress = "192.168.100.31:3000";
+  const ipAdress = "192.168.100.144:3000";
 
   const handleSignin = () => {
     fetch(`http://${ipAdress}/users/signin`, {
