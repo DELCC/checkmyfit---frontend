@@ -13,6 +13,9 @@ import { addUserToStore } from "../reducers/users";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Sparkles } from "lucide-react-native";
 
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+
 export default function Auth({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -21,10 +24,10 @@ export default function Auth({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const ipAdress = "192.168.100.31:3000";
+  // const ipAdress = "192.168.100.144:3000";
 
   const handleSignin = () => {
-    fetch(`http://${ipAdress}/users/signin`, {
+    fetch(`${API_IP}:${API_PORT}/users/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

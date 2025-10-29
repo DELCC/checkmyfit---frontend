@@ -20,7 +20,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import ImagePickerField from "../components/uploadPic";
 
-const ipAdress = "192.168.100.171:3000";
+// const ipAdress = "192.168.100.171:3000";
+
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
 const bodyTypes = ["Athletic", "Slim", "Average", "Curvy", "Plus Size"];
 const stylePreferencesOptions = [
@@ -70,7 +73,7 @@ export default function EditProfile({
   const handleEdit = () => {
     if (!user.token) return;
 
-    fetch(`http://${ipAdress}/users/${user.token}`, {
+    fetch(`${API_IP}:${API_PORT}/users/${user.token}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -109,7 +112,7 @@ export default function EditProfile({
 
   // GET ----- All AI Assistants
   useEffect(() => {
-    fetch(`http://${ipAdress}/aiassistants`)
+    fetch(`${API_IP}:${API_PORT}/aiassistants`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

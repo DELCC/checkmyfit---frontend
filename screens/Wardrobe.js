@@ -15,6 +15,9 @@ import { Bell, Settings } from "lucide-react-native";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import CameraViewStyle from "../components/CameraViewStyle";
 
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+
 const closetCategories = [
   "All",
   "Tops",
@@ -31,7 +34,7 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
   );
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const ipAdress = "192.168.100.144:3000";
+  // const ipAdress = "192.168.100.144:3000";
 
   const items = Array.from({ length: 18 }, (_, i) => ({
     id: i + 1,
