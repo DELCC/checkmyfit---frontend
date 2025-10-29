@@ -26,6 +26,9 @@ export default function Auth({ navigation }) {
 
   // const ipAdress = "192.168.100.144:3000";
 
+  console.log(API_IP);
+  console.log(API_PORT);
+
   const handleSignin = () => {
     fetch(`${API_IP}:${API_PORT}/users/signin`, {
       method: "POST",
