@@ -107,7 +107,39 @@ export default function EditProfile({
         }
       })
       .catch(() => console.log("error"));
+    handleSave();
     navigation.navigate("Home");
+  };
+
+  // ADD UPLOADED PROFILE PIC ON DB
+  const handleSave = () => {
+    if (profileImage && !profileImage.startsWith("http")) {
+      const data = new FormData();
+      data.append("photoFromFront", {
+        uri: profileImage,
+        type: "image/jpeg",
+        name: "profile.jpg",
+      });
+
+      fetch(`${API_IP}:${API_PORT}/users/upload`, {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.result) {
+            const cloudUrl = data.url;
+
+            // Now save this Cloudinary URL to your user profile
+            return fetch(`${API_IP}:${API_PORT}/users/${user.token}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ profilePic: cloudUrl }),
+            });
+          }
+        })
+        .catch((err) => console.error("Upload error:", err));
+    }
   };
 
   // GET ----- All AI Assistants
