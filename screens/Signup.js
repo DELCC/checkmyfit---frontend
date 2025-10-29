@@ -13,6 +13,9 @@ import { Sparkles } from "lucide-react-native";
 import { useDispatch } from "react-redux";
 import { addUserToStore } from "../reducers/users";
 
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+
 export default function Signup({ navigation }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -22,7 +25,7 @@ export default function Signup({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const ipAdress = "192.168.100.31:3000";
+  // const ipAdress = "192.168.100.144:3000";
 
   const EMAIL_REGEX =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -32,7 +35,7 @@ export default function Signup({ navigation }) {
   const handleSignup = () => {
     if (EMAIL_REGEX.test(email) && PASSWORD_REGEX.test(password)) {
       // passer à la suite
-      fetch(`http://${ipAdress}/users/signup`, {
+      fetch(`${API_IP}:${API_PORT}/users/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
