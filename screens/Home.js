@@ -1,9 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet, Modal , ScrollView,  
-  FlatList, } from "react-native";
+  FlatList,Image } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Bell, Settings, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
+import { useSelector, useDispatch } from "react-redux";
+import { addOutfit, updateUser} from "../reducers/users";
 
 export default function HomeScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(true);
@@ -42,6 +44,43 @@ export default function HomeScreen({ navigation, route }) {
     { id: 5, category: "Outerwear" },
     { id: 6, category: "Dresses" },
   ];
+const IP_ADDRESS = "192.168.100.31";
+const dispatch = useDispatch();
+const user = useSelector((state) => state.users.value);
+useEffect(() => {
+fetch(`http://${IP_ADDRESS}:3000/users/${user.token}`)
+  .then(response => response.json())
+  .then( data =>{ 
+    console.log(data);
+    dispatch(updateUser({username : data.user.username,
+      bio : data.user.bio,
+      skinTone : data.user.skinTone,
+      bodyType : data.user.bodyType,
+      height : data.user.height,
+      weight : data.user.weight,
+      stylePreferences : data.user.stylePreferences}))})
+    .catch(error => console.log(error));
+fetch(`http:${IP_ADDRESS}:3000/outfits/${user.token}`)
+  .then(response => response.json())
+  .then( data => {
+    data.outfits.map(outfit => {
+      return dispatch(addOutfit({
+        outfitPic : outfit.outfitPic,
+        rating : outfit.rating,
+        comment : outfit.comment,
+        suggestion : outfit.suggestion
+      }))
+      .cattch(error => console.log(error));
+    })
+  });
+// fetch(`http:${IP_ADDRESS}:3000/items/${user.token}`)
+//   .then(response => response.json())
+//   .then( data => console.log(data));
+},[]);
+
+console.log(user);
+
+
 
 
   return (
@@ -86,7 +125,7 @@ export default function HomeScreen({ navigation, route }) {
           </View>
         </View>
 
-        <Text style={styles.greeting}>Good morning, Jane!</Text>
+        <Text style={styles.greeting}>Good morning, {user?.infoUser?.username || "Guest"}!</Text>
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
@@ -104,15 +143,21 @@ export default function HomeScreen({ navigation, route }) {
         {/* Recent Styles */}
         <Text style={styles.sectionTitle}>Recent Styles</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {recentStyles.map((style) => (
+          {user.outfits.map((style, id) => (
             <TouchableOpacity
-              key={style.id}
+              key={id}
               style={styles.outfitCard}
               onPress={() => setSelectedOutfit(style.id)}
             >
               <View style={styles.badge}>
                 <Ionicons name="star" size={12} color="#fff" />
                 <Text style={styles.badgeText}>{style.rating}</Text>
+                {style.outfitPic && <Image  source={{
+                    uri: style.outfitPic,
+                  }}
+                  style={styles.badge}
+                  resizeMode="cover"
+                />}
               </View>
               <Text style={styles.outfitLabel}>Outfit</Text>
             </TouchableOpacity>
