@@ -29,12 +29,12 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
     setModalVisible(false);
   };
 
-   const recentStyles = [
-    { id: 1, rating: 4.5 },
-    { id: 2, rating: 4.8 },
-    { id: 3, rating: 4.2 },
-    { id: 4, rating: 4.6 },
-  ];
+  //  const recentStyles = [
+  //   { id: 1, rating: 4.5 },
+  //   { id: 2, rating: 4.8 },
+  //   { id: 3, rating: 4.2 },
+  //   { id: 4, rating: 4.6 },
+  // ];
 
   const closetItems = [
     { id: 1, category: "Tops" },

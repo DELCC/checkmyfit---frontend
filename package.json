@@ -16,7 +16,7 @@
     "dotenv": "^17.2.3",
     "expo": "54.0.20",
     "expo-camera": "^17.0.8",
-    "expo-image-picker": "~17.0.8",
+    "expo-image-picker": "^17.0.8",
     "expo-linear-gradient": "~15.0.7",
     "expo-status-bar": "~3.0.8",
     "lucide-react-native": "^0.546.0",
