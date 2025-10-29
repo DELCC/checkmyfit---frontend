@@ -76,7 +76,7 @@ export default function AIStylist() {
             .then((response) => response.json())
             .then((data) => {
               // setAnalysis(data.analysis.data.responses);
-              console.log(data);
+              // console.log(data.data.error.details);
               const rawResponse = data.data.data.analysis.responses;
               console.log(rawResponse);
               const stringValue = rawResponse[0].value;
@@ -89,7 +89,9 @@ export default function AIStylist() {
               setStyleComments(AIResultObject.comment);
               setImprovementSuggestions(AIResultObject.suggestions);
             })
-            .catch((error) => console.log(error));
+            .catch((error) => {console.log(error);
+              setModalResultVisible(false);
+            });
           // .catch((error) => console.log(error));
         }
         setModalResultVisible(true);
