@@ -4,7 +4,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Camera as CameraIcon, Sparkles, X } from "lucide-react-native";
 
-export default function CameraViewStyleItem({ onClose, showPreviewPicture }) {
+export default function CameraViewStyleItem({ onClose, getCloudinaryData }) {
   const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState(false);
@@ -17,17 +17,14 @@ export default function CameraViewStyleItem({ onClose, showPreviewPicture }) {
 
   const takePicture = async () => {
     const photo = await cameraRef.current?.takePictureAsync({ quality: 0.3 });
-    photo && console.log(photo);
+    photo && console.log(photo.uri);
+    const formData = new FormData();
     if (photo) {
       formData.append("photoFromFront", {
         uri: photo.uri,
         name: "photo.jpg",
         type: "image/jpeg",
       });
-
-      const formData = new FormData();
-      console.log(photo);
-
       fetch(`http://${IP_ADDRESS}/items/upload`, {
         method: "POST",
         body: formData,
@@ -35,12 +32,12 @@ export default function CameraViewStyleItem({ onClose, showPreviewPicture }) {
         .then((response) => response.json())
         .then((data) => {
           if (data) {
-            console.log(`success : ${data}`);
+            console.log(`success : ${data.public_id}`);
+            getCloudinaryData(data.original_url, data.public_id);
           } else {
             console.log(`error`);
           }
         });
-      //   showPreviewPicture(photo);
     }
   };
 

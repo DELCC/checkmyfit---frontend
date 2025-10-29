@@ -31,7 +31,7 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
   );
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const ipAdress = "192.168.100.31:3000";
+  const ipAdress = "192.168.100.144:3000";
 
   const items = Array.from({ length: 18 }, (_, i) => ({
     id: i + 1,

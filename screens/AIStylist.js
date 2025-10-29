@@ -23,13 +23,12 @@ export default function AIStylist() {
   const [picture, setPicture] = useState("");
   const [promptInput, setPromptInput] = useState("");
   const [starRate, setStarRate] = useState("");
-  const [ styleComments, setStyleComments] = useState("");
+  const [styleComments, setStyleComments] = useState("");
   const [improvementSuggestions, setImprovementSuggestions] = useState("");
-  
- 
+
   const formData = new FormData();
 
-  const IP_ADDRESS = "192.168.100.31";
+  const IP_ADDRESS = "192.168.100.144";
 
   const selectedStylist = {
     initials: "CD",
@@ -77,16 +76,15 @@ export default function AIStylist() {
               console.log(rawResponse);
               const stringValue = rawResponse[0].value;
               console.log(stringValue);
-              const AIResultObject =JSON.parse(stringValue);
+              const AIResultObject = JSON.parse(stringValue);
               console.log(AIResultObject);
               console.log(AIResultObject.suggestions);
               setIsLoading(false);
               setStarRate(AIResultObject.rating);
               setStyleComments(AIResultObject.comment);
               setImprovementSuggestions(AIResultObject.suggestions);
-
             })
-            .catch(error => console.log(error));
+            .catch((error) => console.log(error));
         }
         setModalResultVisible(true);
       });
@@ -102,27 +100,28 @@ export default function AIStylist() {
 
   const saveOutfit = () => {
     fetch(`http://${IP_ADDRESS}:3000/outfits/${user.token}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                  outfitPic: picture ,
-                  rating: starRate,
-                  comment: styleComments,
-                  suggestion: improvementSuggestions,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-  });
-    dispatch(addOutfit(
-              {outfitPic: picture ,
-               rating: starRate,
-               comment: styleComments,
-               suggestion: improvementSuggestions,
-              }));
-
-};
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        outfitPic: picture,
+        rating: starRate,
+        comment: styleComments,
+        suggestion: improvementSuggestions,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      });
+    dispatch(
+      addOutfit({
+        outfitPic: picture,
+        rating: starRate,
+        comment: styleComments,
+        suggestion: improvementSuggestions,
+      })
+    );
+  };
 
   return (
     <SafeAreaProvider>
