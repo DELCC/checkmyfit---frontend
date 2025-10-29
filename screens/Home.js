@@ -160,30 +160,28 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
             <Text style={styles.sectionTitle}>Recent Styles</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {user.outfits.map((style, id) => (
-                <View>
+                <View key={id}>
                     {style.outfitPic ? (
                       <TouchableOpacity
-                  key={id}
                   style={styles.outfitCard}
-                  onPress={() => setSelectedOutfit(style.id)}
+                  onPress={() => setSelectedOutfit(id)}
                 >
-                      <View style={styles.badge}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={styles.badgeText}>{style.rating}</Text>
                           <Image
                             source={{
                               uri: style.outfitPic,
                             }}
-                            style={styles.badge}
+                            style={styles.outfitImage}
                             resizeMode="cover"
                           />
+                      <View style={styles.badge}>
+                        <Ionicons name="star" size={12} color="#fff" />
+                        <Text style={styles.badgeText}>{style.rating}</Text>
                           </View>
                           </TouchableOpacity>
                     ): (
               <TouchableOpacity
-                  key={id}
                   style={styles.outfitCard}
-                  onPress={() => setSelectedOutfit(style.id)}
+                  onPress={() => setSelectedOutfit(id)}
                 > 
                 <View style={styles.badge}>
                         <Ionicons name="star" size={12} color="#fff" />
@@ -194,56 +192,8 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
                   )}
               </View>))}
             </ScrollView>
-           
-      
-        {/* Recent Styles */}
-        <Text style={styles.sectionTitle}>Recent Styles</Text>
-        {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {user.outfits.map((style, id) => (
-            <TouchableOpacity
-              key={id}
-              style={styles.outfitCard}
-              onPress={() => setSelectedOutfit(id)}
-            >
-              {style.outfitPic? ( <Image  source={{
-                    uri: style.outfitPic
-                  }}
-                  style={styles.outfitCard}
-                  resizeMode="cover"
-                />) :( <View style={styles.badge}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={styles.badgeText}>{style.rating}</Text>
-                        <Text style={styles.outfitLabel}>Outfit</Text>
-                      </View>
-              )}
-              
-            </TouchableOpacity>
-          ))}
-        </ScrollView> */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-  {user.outfits.map((style,id) => (
-    <TouchableOpacity
-      key={id} // ✅ clé unique
-      style={styles.outfitCard}
-      onPress={() => setSelectedOutfit(id)} // ✅ meilleure référence que l’index
-    >
-      {style.outfitPic ? (
-        <Image
-          source={{ uri: style.outfitPic }}
-          style={styles.outfitImage} // ✅ style séparé pour l’image
-          resizeMode="cover"
-        />
-      ) : (
-        <View style={styles.badge}>
-          <Ionicons name="star" size={12} color="#fff" />
-          <Text style={styles.badgeText}>{style.rating}</Text>
-          <Text style={styles.outfitLabel}>Outfit</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  ))}
-</ScrollView>
-
+          
+        
             {/* My Virtual Closet */}
             <Text style={styles.sectionTitle}>My Virtual Closet</Text>
             <View style={styles.closetGrid}>
@@ -523,4 +473,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   modalButtonText: { color: '#fff', fontWeight: 'bold' },
+  outfitImage: {
+  position: "absolute",
+  width: "100%",
+  height: "100%",
+  borderRadius: 12,
+},
 });
