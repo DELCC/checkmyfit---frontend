@@ -29,7 +29,7 @@ export default function AIStylist() {
 
   const formData = new FormData();
 
-  const IP_ADDRESS = "192.168.100.144";
+  const IP_ADDRESS = "192.168.100.31";
 
   const selectedStylist = {
     initials: "CD",

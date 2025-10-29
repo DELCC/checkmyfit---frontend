@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from "react-redux";
 import { addOutfit, updateUser} from "../reducers/users";
 
-export default function HomeScreen({ navigation, route }) {
+export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
   const [modalVisible, setModalVisible] = useState(true);
   const [selectedOutfit, setSelectedOutfit] = useState(null);
   useEffect(() => {
@@ -147,19 +147,20 @@ console.log(user);
             <TouchableOpacity
               key={id}
               style={styles.outfitCard}
-              onPress={() => setSelectedOutfit(style.id)}
+              onPress={() => setSelectedOutfit(id)}
             >
-              <View style={styles.badge}>
-                <Ionicons name="star" size={12} color="#fff" />
-                <Text style={styles.badgeText}>{style.rating}</Text>
-                {style.outfitPic && <Image  source={{
-                    uri: style.outfitPic,
+              {style.outfitPic? ( <Image  source={{
+                    uri: style.outfitPic
                   }}
-                  style={styles.badge}
+                  style={styles.outfitCard}
                   resizeMode="cover"
-                />}
-              </View>
-              <Text style={styles.outfitLabel}>Outfit</Text>
+                />) :( <View style={styles.badge}>
+                        <Ionicons name="star" size={12} color="#fff" />
+                        <Text style={styles.badgeText}>{style.rating}</Text>
+                        <Text style={styles.outfitLabel}>Outfit</Text>
+                      </View>
+              )}
+              
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -427,4 +428,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   modalButtonText: { color: '#fff', fontWeight: 'bold' },
+  // badgeImage: {
+  //   width: 20,       
+  //   height: 20,      
+  //   borderRadius: 10, 
+  //   marginLeft: 4,   
+  // },
 });
