@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,9 +13,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { launchImageLibrary } from "react-native-image-picker";
 import DropDownPicker from "react-native-dropdown-picker";
-import { ArrowLeft, Camera } from "lucide-react-native";
+import { ArrowLeft, Camera, Sparkles } from "lucide-react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../reducers/users";
+import { LinearGradient } from "expo-linear-gradient";
+import * as ImagePicker from "expo-image-picker";
+import ImagePickerField from "../components/uploadPic";
+
+const ipAdress = "192.168.100.171:3000";
 
 const bodyTypes = ["Athletic", "Slim", "Average", "Curvy", "Plus Size"];
 const stylePreferencesOptions = [
@@ -55,28 +60,22 @@ export default function EditProfile({
   const [skinOpen, setSkinOpen] = useState(false);
   const [styleOpen, setStyleOpen] = useState(false);
 
+  const [assistants, setAssistants] = useState([]);
+  const [selectedAssistant, setSelectedAssistant] = useState(null);
+
   const dispatch = useDispatch();
   const user = useSelector((state) => state.users.value);
 
-  // Image picker
-  //   const handleImagePick = () => {
-  //     launchImageLibrary(
-  //       { mediaType: "photo", quality: 0.8 },
-  //       (response) => {
-  //         if (!response.didCancel && response.assets?.length > 0) {
-  //           setProfileImage(response.assets[0].uri);
-  //         }
-  //       }
-  //     );
-  //   };
-
+  // -------- EDIT PROFILE IN DB
   const handleEdit = () => {
     if (!user.token) return;
 
-    fetch(`http://192.168.100.171:3000/users/${user.token}`, {
+    fetch(`http://${ipAdress}/users/${user.token}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        aiAssistant: selectedAssistant,
+        profilePic: profileImage,
         bio,
         height,
         weight,
@@ -90,6 +89,8 @@ export default function EditProfile({
         if (data) {
           dispatch(
             updateUser({
+              aiAssistant: data.user.selectedAssistant,
+              profilePic: data.user.profileImage,
               bio: data.user.bio,
               bodyType: data.user.bodyType,
               weight: data.user.weight,
@@ -105,6 +106,23 @@ export default function EditProfile({
       .catch(() => console.log("error"));
     navigation.navigate("Home");
   };
+
+  // GET ----- All AI Assistants
+  useEffect(() => {
+    fetch(`http://${ipAdress}/aiassistants`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setAssistants(data.allAssistants);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch assistants:", error);
+      });
+  }, []);
 
   return (
     <SafeAreaView
@@ -140,132 +158,198 @@ export default function EditProfile({
             </View>
           </View>
 
-          {/* Profile Pic */}
-          <View style={styles.body}>
-            <View style={styles.section}>
-              <Text style={styles.label}>Profile Picture</Text>
-              <View style={styles.profileRow}>
-                <View style={styles.avatarWrapper}>
-                  {profileImage ? (
-                    <Image
-                      source={{ uri: profileImage }}
-                      style={styles.avatar}
-                    />
-                  ) : (
-                    <View style={styles.avatarPlaceholder}>
-                      <Text style={styles.avatarText}>JD</Text>
+          {/* AI ASSISTANT --------------- */}
+          <View style={styles.aiSection}>
+            <View style={styles.aiHeader}>
+              <Sparkles width={20} height={20} color="#027f8c" />
+              <Text style={styles.aiTitle}>Choose Your AI Assistant</Text>
+            </View>
+
+            <Text style={styles.aiSubtitle}>
+              Pick a virtual assistant to match your vibe
+            </Text>
+
+            {assistants.map((assistant) => (
+              <TouchableOpacity
+                key={assistant._id}
+                style={[
+                  styles.aiCard,
+                  selectedAssistant === assistant._id && styles.aiCardSelected,
+                ]}
+                onPress={() => setSelectedAssistant(assistant._id)}
+                activeOpacity={0.9}
+              >
+                <View style={styles.aiCardContent}>
+                  <View
+                    style={[
+                      styles.aiAvatarWrapper,
+                      { borderColor: "#027f8c" }, // ACCENT COLOR
+                    ]}
+                  >
+                    <LinearGradient
+                      colors={["#3399FF", "#00C896"]} //COLOR GRADIENT
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.aiAvatarWrapper}
+                    >
+                      {assistant.aiassistantPic ? (
+                        <Image
+                          source={require("../assets/aiAssistant.jpg")}
+                          style={styles.aiAvatar}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={[styles.aiAvatarFallback]}>
+                          <Text style={styles.aiAvatarText}>
+                            {assistant.aiassistantName
+                              ? assistant.aiassistantName[0].toUpperCase()
+                              : "A"}
+                          </Text>
+                        </View>
+                      )}
+                    </LinearGradient>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.aiName}>
+                      {assistant.aiassistantName}
+                    </Text>
+                    <View style={styles.styleTagsContainer}>
+                      {assistant.aiassistantStyle.map((tag, i) => (
+                        <View key={i} style={styles.styleTag}>
+                          <Text style={styles.styleTagText}>{tag}</Text>
+                        </View>
+                      ))}
+                    </View>
+                    <Text style={styles.aiDescription}>
+                      {assistant.aiassistantDescription}
+                    </Text>
+                  </View>
+
+                  {selectedAssistant === assistant._id && (
+                    <View style={styles.aiCheckmark}>
+                      <Text style={styles.aiCheckmarkText}>✓</Text>
                     </View>
                   )}
                 </View>
-                <View style={{ flex: 1 }}>
-                  <TouchableOpacity
-                    style={styles.uploadButton} /*onPress={handleImagePick}*/
-                  >
-                    <Camera
-                      size={18}
-                      color="white"
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={styles.uploadButtonText}>Upload Photo</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.helperText}>JPG, PNG up to 5MB</Text>
-                </View>
-              </View>
-            </View>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-            <View style={styles.editSection}>
-              {/* Bio */}
-              <Text style={styles.label}>Bio</Text>
-              <TextInput
-                style={styles.input}
-                value={bio}
-                onChangeText={setBio}
-                placeholder="Tell us about your style..."
-                multiline
-                numberOfLines={3}
-              />
+          {/* UPLOAD ---------- IMAGE ----- component uploadPic */}
+          <ImagePickerField
+            label="Profile Picture"
+            value={profileImage}
+            onChange={setProfileImage}
+            styles={styles}
+          />
+          <View style={styles.editSection}>
+            {/* Bio ---------------------- */}
+            <Text style={styles.label}>Bio</Text>
+            <TextInput
+              style={styles.input}
+              value={bio}
+              onChangeText={setBio}
+              placeholder="Tell us about your style..."
+              multiline
+              numberOfLines={3}
+            />
 
-              {/* Height */}
-              <Text style={styles.label}>Height (cm)</Text>
-              <TextInput
-                style={styles.input}
-                value={height}
-                onChangeText={setHeight}
-                placeholder="180"
-              />
+            {/* Height ---------------------- */}
+            <Text style={styles.label}>Height (cm)</Text>
+            <TextInput
+              style={styles.input}
+              value={height}
+              onChangeText={setHeight}
+              placeholder="180"
+            />
 
-              {/* Weight */}
-              <Text style={styles.label}>Weight (kg)</Text>
-              <TextInput
-                style={styles.input}
-                value={weight}
-                onChangeText={setWeight}
-                placeholder="80"
-                keyboardType="numeric"
-              />
+            {/* Weight ---------------------- */}
+            <Text style={styles.label}>Weight (kg)</Text>
+            <TextInput
+              style={styles.input}
+              value={weight}
+              onChangeText={setWeight}
+              placeholder="80"
+              keyboardType="numeric"
+            />
 
-              {/* Skintone */}
-              <Text style={styles.label}>Skin Tone</Text>
-              <DropDownPicker
-                style={styles.input}
-                open={skinOpen}
-                value={skinTone}
-                items={skinTones.map((tone) => ({ label: tone, value: tone }))}
-                setOpen={setSkinOpen}
-                setValue={setSkinTone}
-                containerStyle={{ marginBottom: 16 }}
-                dropDownContainerStyle={{ maxHeight: 150 }}
-                zIndex={3000}
-                dropDownDirection="BOTTOM"
-                listMode="SCROLLVIEW"
-              />
+            {/* Skintone ---------------------- */}
+            <Text style={styles.label}>Skin Tone</Text>
+            <DropDownPicker
+              style={styles.input}
+              open={skinOpen}
+              value={skinTone}
+              items={skinTones.map((tone) => ({ label: tone, value: tone }))}
+              setOpen={setSkinOpen}
+              setValue={setSkinTone}
+              containerStyle={{ marginBottom: 16 }}
+              dropDownContainerStyle={{ maxHeight: 150 }}
+              zIndex={3000}
+              dropDownDirection="BOTTOM"
+              listMode="SCROLLVIEW"
+            />
 
-              {/* Bodytype */}
-              <Text style={styles.label}>Body Type</Text>
-              <DropDownPicker
-                style={styles.input}
-                open={bodyOpen}
-                value={bodyType}
-                items={bodyTypes.map((type) => ({ label: type, value: type }))}
-                setOpen={setBodyOpen}
-                setValue={setBodyType}
-                containerStyle={{ marginBottom: 16 }}
-                dropDownContainerStyle={{ maxHeight: 150 }}
-                zIndex={2000}
-                dropDownDirection="BOTTOM"
-                listMode="SCROLLVIEW"
-              />
+            {/* Bodytype ---------------------- */}
+            <Text style={styles.label}>Body Type</Text>
+            <DropDownPicker
+              style={styles.input}
+              open={bodyOpen}
+              value={bodyType}
+              items={bodyTypes.map((type) => ({ label: type, value: type }))}
+              setOpen={setBodyOpen}
+              setValue={setBodyType}
+              containerStyle={{ marginBottom: 16 }}
+              dropDownContainerStyle={{ maxHeight: 150 }}
+              zIndex={2000}
+              dropDownDirection="BOTTOM"
+              listMode="SCROLLVIEW"
+            />
 
-              {/* Style pref */}
-              <Text style={styles.label}>Style Preferences</Text>
-              <DropDownPicker
-                style={styles.input}
-                multiple={true}
-                min={0}
-                max={stylePreferencesOptions.length}
-                open={styleOpen}
-                value={stylePreferences}
-                items={stylePreferencesOptions.map((style) => ({
-                  label: style,
-                  value: style,
-                }))}
-                setOpen={setStyleOpen}
-                setValue={setStylePreferences}
-                containerStyle={{ marginBottom: 16 }}
-                dropDownContainerStyle={{ maxHeight: 150 }}
-                zIndex={1000}
-                dropDownDirection="BOTTOM"
-                listMode="SCROLLVIEW"
-              />
+            {/* Style pref ---------------------- */}
+            <Text style={styles.label}>Style Preferences</Text>
+            <DropDownPicker
+              style={styles.input}
+              multiple={true}
+              min={0}
+              max={stylePreferencesOptions.length}
+              open={styleOpen}
+              value={stylePreferences}
+              items={stylePreferencesOptions.map((style) => ({
+                label: style,
+                value: style,
+              }))}
+              setOpen={setStyleOpen}
+              setValue={setStylePreferences}
+              containerStyle={{ marginBottom: 16 }}
+              dropDownContainerStyle={{ maxHeight: 150 }}
+              zIndex={1000}
+              dropDownDirection="BOTTOM"
+              listMode="SCROLLVIEW"
+            />
 
-              {/* Save Btn */}
-              <TouchableOpacity style={styles.saveButton} onPress={handleEdit}>
+            {/* Save Btn ---------------------- */}
+            <LinearGradient
+              colors={["#007F8C", "#00C896"]} // your gradient
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.saveButton} // same style as before
+            >
+              <TouchableOpacity
+                onPress={handleEdit}
+                activeOpacity={0.8}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <Text style={styles.saveButtonText}>
                   {route.params?.isNewUser ? "Complete Setup" : "Save Changes"}
                 </Text>
               </TouchableOpacity>
-            </View>
+            </LinearGradient>
           </View>
+          {/* </View> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -388,7 +472,7 @@ const styles = StyleSheet.create({
   uploadButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#34D399",
+    backgroundColor: "#ffffffff",
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -399,7 +483,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   uploadButtonText: {
-    color: "white",
+    color: "#00C896",
     fontWeight: "600",
     fontSize: 14,
   },
@@ -409,15 +493,202 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   saveButton: {
-    backgroundColor: "#34D399",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
     marginTop: 24,
   },
   saveButtonText: {
-    color: "white",
+    color: "#ffffffff",
     fontSize: 16,
     fontWeight: "600",
+  },
+
+  // CSS for Assistant
+  // assistantSection: {
+  //   backgroundColor: "#FAFAF9",
+  //   marginTop: 30,
+  //   marginBottom: 40,
+  // },
+  // sectionTitle: {
+  //   fontSize: 18,
+  //   fontWeight: "600",
+  //   color: "#111827",
+  //   marginBottom: 16,
+  // },
+  // assistantCard: {
+  //   backgroundColor: "#FFFFFF",
+  //   borderRadius: 16,
+  //   padding: 16,
+  //   marginBottom: 16,
+  //   shadowColor: "#000",
+  //   shadowOpacity: 0.08,
+  //   shadowRadius: 6,
+  //   elevation: 3,
+  // },
+  // assistantInfo: {
+  //   flexDirection: "row",
+  //   alignItems: "flex-start",
+  //   marginBottom: 12,
+  // },
+  // assistantAvatar: {
+  //   width: 64,
+  //   height: 64,
+  //   borderRadius: 32,
+  //   marginRight: 16,
+  //   backgroundColor: "#E5E7EB",
+  // },
+  // assistantName: {
+  //   fontSize: 16,
+  //   fontWeight: "600",
+  //   color: "#111827",
+  // },
+  // assistantDescription: {
+  //   fontSize: 14,
+  //   color: "#6B7280",
+  //   marginTop: 4,
+  // },
+  styleTagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 6,
+  },
+  styleTag: {
+    backgroundColor: "#ECFDF5",
+    borderColor: "#027f8c",
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  styleTagText: {
+    fontSize: 12,
+    color: "#027f8c",
+  },
+  // selectButton: {
+  //   alignSelf: "flex-end",
+  //   borderWidth: 1,
+  //   borderColor: "#10B981",
+  //   borderRadius: 8,
+  //   paddingVertical: 6,
+  //   paddingHorizontal: 16,
+  // },
+  // selectButtonText: {
+  //   color: "#10B981",
+  //   fontWeight: "600",
+  // },
+  // selectButtonActive: {
+  //   backgroundColor: "#10B981",
+  // },
+  // selectButtonTextActive: {
+  //   color: "#FFFFFF",
+  // },
+
+  // new ai assist
+  aiSection: {
+    padding: 20,
+    backgroundColor: "#FAFAF9",
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  aiHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
+  aiTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  aiSubtitle: {
+    color: "#6B7280",
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  aiCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
+  },
+  aiCardSelected: {
+    borderColor: "#027f8c",
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  aiCardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  aiAvatarWrapper: {
+    // width: 64,
+    // height: 64,
+    // borderRadius: 32,
+    // overflow: "hidden",
+    // borderWidth: 2,
+    // justifyContent: "center",
+    // alignItems: "center",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  aiAvatar: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 32,
+  },
+  aiAvatarFallback: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  aiAvatarText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 22,
+  },
+  aiName: {
+    color: "#111827",
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 2,
+  },
+  aiTagline: {
+    color: "#6B7280",
+    fontSize: 14,
+  },
+  aiCheckmark: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#027f8c",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  aiCheckmarkText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  aiDescription: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 4,
   },
 });
