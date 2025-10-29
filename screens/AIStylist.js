@@ -13,7 +13,8 @@ import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState } from "react";
 import CameraViewStyle from "../components/CameraViewStyle";
 import AIResponse from "../components/AIResponse";
-
+import { useSelector, useDispatch } from "react-redux";
+import { addOutfit } from "../reducers/users";
 export default function AIStylist() {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
@@ -94,20 +95,32 @@ export default function AIStylist() {
   };
   // console.log(previewPicture);
 
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.users.value);
+
   const saveOutfit = () => {
-    fetch(`http://${IP_ADDRESS}:3000/outfits/:token`, {
+    fetch(`http://${IP_ADDRESS}:3000/outfits/${user.token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        user: data._id,
-        outfitPic: req.body.outfitPic,
-        rating: req.body.rating,
-        comment: req.body.comment,
-        suggestion: req.body.suggestion,
+        outfitPic: picture,
+        rating: starRate,
+        comment: styleComments,
+        suggestion: improvementSuggestions,
       }),
     })
       .then((response) => response.json())
-      .then((data) => {});
+      .then((data) => {
+        console.log(data);
+      });
+    dispatch(
+      addOutfit({
+        outfitPic: picture,
+        rating: starRate,
+        comment: styleComments,
+        suggestion: improvementSuggestions,
+      })
+    );
   };
 
   return (
