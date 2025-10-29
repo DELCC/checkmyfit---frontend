@@ -56,7 +56,7 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
     { id: 5, category: "Outerwear" },
     { id: 6, category: "Dresses" },
   ];
-  const IP_ADDRESS = "192.168.100.31";
+  
   const dispatch = useDispatch();
   const user = useSelector((state) => state.users.value);
   useEffect(() => {
@@ -157,37 +157,48 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Recent Styles */}
             <Text style={styles.sectionTitle}>Recent Styles</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {user.outfits.map((style, id) => (
-                <TouchableOpacity
+                <View>
+                    {style.outfitPic ? (
+                      <TouchableOpacity
                   key={id}
                   style={styles.outfitCard}
                   onPress={() => setSelectedOutfit(style.id)}
                 >
-                  <View style={styles.badge}>
-                    <Ionicons name="star" size={12} color="#fff" />
+                      <View style={styles.badge}>
+                        <Ionicons name="star" size={12} color="#fff" />
+                        <Text style={styles.badgeText}>{style.rating}</Text>
+                          <Image
+                            source={{
+                              uri: style.outfitPic,
+                            }}
+                            style={styles.badge}
+                            resizeMode="cover"
+                          />
+                          </View>
+                          </TouchableOpacity>
+                    ): (
+              <TouchableOpacity
+                  key={id}
+                  style={styles.outfitCard}
+                  onPress={() => setSelectedOutfit(style.id)}
+                > 
+                <View style={styles.badge}>
+                        <Ionicons name="star" size={12} color="#fff" />
                     <Text style={styles.badgeText}>{style.rating}</Text>
-                    {style.outfitPic && (
-                      <Image
-                        source={{
-                          uri: style.outfitPic,
-                        }}
-                        style={styles.badge}
-                        resizeMode="cover"
-                      />
-                    )}
+                    <Text style={styles.outfitLabel}>Outfit</Text>
                   </View>
-                  <Text style={styles.outfitLabel}>Outfit</Text>
-                </TouchableOpacity>
-              ))}
+                    </TouchableOpacity>
+                  )}
+              </View>))}
             </ScrollView>
-            </ScrollView>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+           
+      
         {/* Recent Styles */}
         <Text style={styles.sectionTitle}>Recent Styles</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {user.outfits.map((style, id) => (
             <TouchableOpacity
               key={id}
@@ -208,7 +219,30 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
               
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </ScrollView> */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+  {user.outfits.map((style,id) => (
+    <TouchableOpacity
+      key={id} // ✅ clé unique
+      style={styles.outfitCard}
+      onPress={() => setSelectedOutfit(id)} // ✅ meilleure référence que l’index
+    >
+      {style.outfitPic ? (
+        <Image
+          source={{ uri: style.outfitPic }}
+          style={styles.outfitImage} // ✅ style séparé pour l’image
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={styles.badge}>
+          <Ionicons name="star" size={12} color="#fff" />
+          <Text style={styles.badgeText}>{style.rating}</Text>
+          <Text style={styles.outfitLabel}>Outfit</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  ))}
+</ScrollView>
 
             {/* My Virtual Closet */}
             <Text style={styles.sectionTitle}>My Virtual Closet</Text>
@@ -489,10 +523,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   modalButtonText: { color: '#fff', fontWeight: 'bold' },
-  // badgeImage: {
-  //   width: 20,       
-  //   height: 20,      
-  //   borderRadius: 10, 
-  //   marginLeft: 4,   
-  // },
 });

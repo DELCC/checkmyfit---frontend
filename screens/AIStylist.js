@@ -22,7 +22,7 @@ const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 export default function AIStylist() {
   const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
-  // const [modalResultVisible, setModalResultVisible] = useState(false);
+  const [modalResultVisible, setModalResultVisible] = useState(false);
   const [previewPicture, setPreviewPicture] = useState("");
   const [picture, setPicture] = useState("");
   const [promptInput, setPromptInput] = useState("");
@@ -31,7 +31,8 @@ export default function AIStylist() {
   const [improvementSuggestions, setImprovementSuggestions] = useState("");
   const formData = new FormData();
 
-  const IP_ADDRESS = "192.168.100.144:3000";
+  const IP_ADDRESS = process.env.EXPO_PUBLIC_API_IP;
+  const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
   const selectedStylist = {
     initials: "CD",
@@ -60,7 +61,7 @@ export default function AIStylist() {
         if (data.result) {
           console.log(data.url);
           setPicture(data.url);
-          fetch(`${IP_ADDRESS}/pictures/aianalysis`, {
+          fetch(`${IP_ADDRESS}:${API_PORT}/pictures/aianalysis`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
