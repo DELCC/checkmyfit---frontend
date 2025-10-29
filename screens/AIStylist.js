@@ -24,7 +24,7 @@ export default function AIStylist() {
   const [promptInput, setPromptInput] = useState("");
   const [starRate, setStarRate] = useState("");
   const [styleComments, setStyleComments] = useState("");
-  const [styleComments, setStyleComments] = useState("");
+
   const [improvementSuggestions, setImprovementSuggestions] = useState("");
 
   const formData = new FormData();
@@ -78,7 +78,7 @@ export default function AIStylist() {
               const stringValue = rawResponse[0].value;
               console.log(stringValue);
               const AIResultObject = JSON.parse(stringValue);
-              const AIResultObject = JSON.parse(stringValue);
+
               console.log(AIResultObject);
               console.log(AIResultObject.suggestions);
               setIsLoading(false);
@@ -86,7 +86,6 @@ export default function AIStylist() {
               setStyleComments(AIResultObject.comment);
               setImprovementSuggestions(AIResultObject.suggestions);
             })
-            .catch((error) => console.log(error));
             .catch((error) => console.log(error));
         }
         setModalResultVisible(true);
