@@ -28,16 +28,10 @@ export default function AIStylist() {
   const [promptInput, setPromptInput] = useState("");
   const [starRate, setStarRate] = useState("");
   const [styleComments, setStyleComments] = useState("");
-
-  const [styleComments, setStyleComments] = useState("");
   const [improvementSuggestions, setImprovementSuggestions] = useState("");
   const formData = new FormData();
 
-<<<<<<< HEAD
-  const IP_ADDRESS = "192.168.100.144";
-=======
-  // const IP_ADDRESS = "192.168.100.144";
->>>>>>> aab61720856516caa628080f62c0f302e58f63a4
+  const IP_ADDRESS = "192.168.100.144:3000";
 
   const selectedStylist = {
     initials: "CD",
@@ -57,7 +51,7 @@ export default function AIStylist() {
       name: "photo.jpg",
       type: "image/jpeg",
     });
-    fetch(`${API_IP}:${API_PORT}/pictures/upload`, {
+    fetch(`${IP_ADDRESS}:${API_PORT}/pictures/upload`, {
       method: "POST",
       body: formData,
     })
@@ -66,7 +60,7 @@ export default function AIStylist() {
         if (data.result) {
           console.log(data.url);
           setPicture(data.url);
-          fetch(`${API_IP}:${API_PORT}/pictures/aianalysis`, {
+          fetch(`${IP_ADDRESS}/pictures/aianalysis`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -87,8 +81,6 @@ export default function AIStylist() {
               const stringValue = rawResponse[0].value;
               console.log(stringValue);
               const AIResultObject = JSON.parse(stringValue);
-              const AIResultObject = JSON.parse(stringValue);
-              // const AIResultObject = JSON.parse(stringValue);
               console.log(AIResultObject);
               console.log(AIResultObject.suggestions);
               setIsLoading(false);
@@ -112,7 +104,7 @@ export default function AIStylist() {
   const user = useSelector((state) => state.users.value);
 
   const saveOutfit = () => {
-    fetch(`${API_IP}:${API_PORT}/outfits/${user.token}`, {
+    fetch(`${API_IP}/outfits/${user.token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

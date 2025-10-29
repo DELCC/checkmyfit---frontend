@@ -156,10 +156,7 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
             </View>
           </View>
 
-          <ScrollView
-            style={styles.content}
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Recent Styles */}
             <Text style={styles.sectionTitle}>Recent Styles</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -185,6 +182,7 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
                   <Text style={styles.outfitLabel}>Outfit</Text>
                 </TouchableOpacity>
               ))}
+            </ScrollView>
             </ScrollView>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Recent Styles */}
@@ -288,7 +286,7 @@ export default function HomeScreen({ navigation, route ,onNavigateToCloset }) {
       </SafeAreaView>
     </SafeAreaProvider>
 
-
+)};
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
