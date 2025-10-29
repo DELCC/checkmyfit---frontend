@@ -1,11 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal , ScrollView,  
+  FlatList, } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Bell, Settings, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
+import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(true);
-  //hello qsd qsd qsd sdqsdqsdqsd qsqsd
+  const [selectedOutfit, setSelectedOutfit] = useState(null);
   useEffect(() => {
     if (route.params?.isNewUser) {
       setModalVisible(true);
@@ -24,6 +26,23 @@ export default function HomeScreen({ navigation, route }) {
     navigation.navigate("EditProfile");
     setModalVisible(false);
   };
+
+   const recentStyles = [
+    { id: 1, rating: 4.5 },
+    { id: 2, rating: 4.8 },
+    { id: 3, rating: 4.2 },
+    { id: 4, rating: 4.6 },
+  ];
+
+  const closetItems = [
+    { id: 1, category: "Tops" },
+    { id: 2, category: "Bottoms" },
+    { id: 3, category: "Shoes" },
+    { id: 4, category: "Accessories" },
+    { id: 5, category: "Outerwear" },
+    { id: 6, category: "Dresses" },
+  ];
+
 
   return (
     <SafeAreaProvider>
@@ -54,20 +73,114 @@ export default function HomeScreen({ navigation, route }) {
             </View>
           </View>
         </Modal>
-
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>Check My Fit AI</Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>JD</Text>
           </View>
-          <View style={styles.icons}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Bell size={20} color="#333" />
+          <View>
+            <Ionicons name="notifications-outline" size={24} color="#666" />
+            <View style={styles.notificationDot} />
+          </View>
+        </View>
+
+        <Text style={styles.greeting}>Good morning, Jane!</Text>
+
+        <View style={styles.infoRow}>
+          <View style={styles.infoItem}>
+            <Ionicons name="cloud-outline" size={18} color="#7BAACF" />
+            <Text style={styles.infoText}>72°F</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Ionicons name="calendar-outline" size={16} color="#666" />
+            <Text style={styles.infoText}>Mon, Oct 20</Text>
+          </View>
+        </View>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Recent Styles */}
+        <Text style={styles.sectionTitle}>Recent Styles</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {recentStyles.map((style) => (
+            <TouchableOpacity
+              key={style.id}
+              style={styles.outfitCard}
+              onPress={() => setSelectedOutfit(style.id)}
+            >
+              <View style={styles.badge}>
+                <Ionicons name="star" size={12} color="#fff" />
+                <Text style={styles.badgeText}>{style.rating}</Text>
+              </View>
+              <Text style={styles.outfitLabel}>Outfit</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Settings size={20} color="#333" />
+          ))}
+        </ScrollView>
+
+        {/* My Virtual Closet */}
+        <Text style={styles.sectionTitle}>My Virtual Closet</Text>
+        <View style={styles.closetGrid}>
+          {closetItems.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.closetItem}
+              onPress={() => onNavigateToCloset(item.category)}
+            >
+              <View style={styles.closetPreview} />
+              <Text style={styles.closetLabel}>{item.category}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Calendar View */}
+        <Text style={styles.sectionTitle}>Calendar View</Text>
+        <View style={styles.calendarCard}>
+          <Text style={styles.calendarTitle}>October 2025</Text>
+          <View style={styles.calendarDaysRow}>
+            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+              <Text key={day} style={styles.calendarDayLabel}>{day}</Text>
+            ))}
+          </View>
+          <View style={styles.calendarGrid}>
+            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+              <View
+                key={day}
+                style={[
+                  styles.calendarCell,
+                  day === 20 && styles.calendarActiveCell,
+                  day <= 20 && day !== 20 && styles.calendarPastCell,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.calendarCellText,
+                    day === 20 && styles.calendarActiveText,
+                    day <= 20 && day !== 20 && styles.calendarPastText,
+                  ]}
+                >
+                  {day}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Outfit Feedback Modal */}
+      <Modal visible={selectedOutfit !== null} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Outfit Feedback</Text>
+            <Text style={styles.modalText}>Feedback for outfit #{selectedOutfit}</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setSelectedOutfit(null)}>
+              <Text style={styles.modalButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+    </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -128,4 +241,145 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalButtonText: { color: "#fff", fontWeight: "600" },
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
+  },
+  header: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderBottomWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#80CBC4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
+  notificationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#4DB6AC',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+  },
+  greeting: { fontSize: 18, color: '#222', marginVertical: 12 },
+  infoRow: { flexDirection: 'row', gap: 16 },
+  infoItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  infoText: { color: '#777' },
+  content: { padding: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#222', marginVertical: 12 },
+  outfitCard: {
+    width: 120,
+    height: 160,
+    borderRadius: 12,
+    backgroundColor: '#E9F5F2',
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  outfitLabel: { color: '#555' },
+  badge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    flexDirection: 'row',
+    backgroundColor: '#4DB6AC',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  badgeText: { color: '#fff', fontSize: 12, marginLeft: 3 },
+  closetGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  closetItem: {
+    width: '30%',
+    aspectRatio: 1,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  closetPreview: {
+    width: '80%',
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: '#E9F5F2',
+    marginBottom: 8,
+  },
+  closetLabel: { fontSize: 12, color: '#A1887F' },
+  calendarCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  calendarTitle: { textAlign: 'center', fontWeight: '600', marginBottom: 8 },
+  calendarDaysRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  calendarDayLabel: { color: '#888', width: 28, textAlign: 'center' },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  calendarCell: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  calendarActiveCell: { backgroundColor: '#4DB6AC' },
+  calendarPastCell: { backgroundColor: '#EEE' },
+  calendarCellText: { fontSize: 12, color: '#999' },
+  calendarActiveText: { color: '#fff' },
+  calendarPastText: { color: '#333' },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBox: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+  modalText: { color: '#555', marginBottom: 20 },
+  modalButton: {
+    backgroundColor: '#4DB6AC',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  modalButtonText: { color: '#fff', fontWeight: 'bold' },
 });

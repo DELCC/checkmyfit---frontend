@@ -4,6 +4,7 @@ const initialState = {
   value: {
     token: null,
     infoUser: {},
+    outfits : [],
   },
 };
 
@@ -21,8 +22,11 @@ export const usersSlice = createSlice({
     updateUser: (state, action) => {
       state.value.infoUser = action.payload;
     },
+    addOutfit : (state,action) => {
+      state.value.outfits.push(action.payload);
+    },
   },
 });
 
-export const { addUserToStore, logout, updateUser } = usersSlice.actions;
+export const { addUserToStore, logout, updateUser, addOutfit } = usersSlice.actions;
 export default usersSlice.reducer;
