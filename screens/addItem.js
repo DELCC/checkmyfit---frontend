@@ -13,6 +13,7 @@ import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { useState, useEffect } from "react";
 import AIResponse from "../components/AIResponse";
 import CameraViewStyleItem from "../components/CameraViewStyleItem";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
@@ -23,14 +24,47 @@ export default function addItem({ navigation }) {
   const [modalResultVisible, setModalResultVisible] = useState(false);
   const [cloudinaryUrl, setCloudinaryUrl] = useState("");
   const [cloudinaryPublicId, setCloudinaryPublicId] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // const IP_ADDRESS = "192.168.100.144";
+  const closetCategories = [
+    "All",
+    "Tops",
+    "Bottoms",
+    "Dresses",
+    "Outerwear",
+    "Shoes",
+    "Accessories",
+  ];
 
   const selectedStylist = {
     initials: "CD",
     name: "Clément Delcourt",
     tagline: "Fashion Enthousiasm",
   };
+
+  // elems for colors dropdown picker
+  const colors = ["White", "Blue", "Dark", "Red", "Green", "Other"];
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [colorOpen, setColorOpen] = useState(false);
+  console.log(selectedColor);
+
+  // elems for seasons dropdown picker
+  const seasons = ["Summer", "Autumn", "Winter", "Spring"];
+  const [selectedSeason, setSelectedSeason] = useState(null);
+  const [seasonOpen, setSeasonOpen] = useState(false);
+  console.log(selectedSeason);
+
+  // elems for event dropdown picker
+  const events = [
+    "Casual",
+    "Professionnel",
+    "Special Event",
+    "Outdoor",
+    "Vacation",
+  ];
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [eventOpen, setEventOpen] = useState(false);
+  console.log(selectedEvent);
 
   // Inverse Data Flow - get Cloudinary URL from CameraViewStyleItem.js
   const getCloudinaryData = (url, publicId) => {
@@ -62,6 +96,7 @@ export default function addItem({ navigation }) {
   const handleTakePhoto = () => {
     setModalPhotoVisible(true);
   };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -117,6 +152,98 @@ export default function addItem({ navigation }) {
             <Text style={styles.buttonText}>Remove background with AI</Text>
           </TouchableOpacity>
 
+          {/* Category Pills */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categories}
+          >
+            {closetCategories.map((category, index) => {
+              const isSelected = category === selectedCategory;
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.categoryBadge,
+                    isSelected
+                      ? { backgroundColor: "#6C5DD3" }
+                      : {
+                          backgroundColor: "#fff",
+                          borderColor: "#D2B48C",
+                          borderWidth: 1,
+                        },
+                  ]}
+                  onPress={() => setSelectedCategory(category)}
+                >
+                  <Text style={{ color: isSelected ? "#fff" : "#D2B48C" }}>
+                    {category}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/*choose a color */}
+          <Text style={styles.label}>Color</Text>
+          <DropDownPicker
+            style={styles.input}
+            open={colorOpen}
+            value={selectedColor}
+            items={colors.map((color) => ({ label: color, value: color }))}
+            setOpen={setColorOpen}
+            setValue={setSelectedColor}
+            containerStyle={{ marginBottom: 16 }}
+            dropDownContainerStyle={{ maxHeight: 150 }}
+            zIndex={3000}
+            zIndexInverse={1000}
+            dropDownDirection="BOTTOM"
+            listMode="SCROLLVIEW"
+          />
+
+          {/*choose a season */}
+          <Text style={styles.label}>Season</Text>
+          <DropDownPicker
+            style={styles.input}
+            open={seasonOpen}
+            value={selectedSeason}
+            items={seasons.map((season) => ({ label: season, value: season }))}
+            setOpen={setSeasonOpen}
+            setValue={setSelectedSeason}
+            containerStyle={{ marginBottom: 16 }}
+            dropDownContainerStyle={{ maxHeight: 150 }}
+            zIndex={2000}
+            zIndexInverse={2000}
+            dropDownDirection="BOTTOM"
+            listMode="SCROLLVIEW"
+          />
+
+          {/*choose an appropriate event */}
+          <Text style={styles.label}>For what kind of event?</Text>
+          <DropDownPicker
+            style={styles.input}
+            open={eventOpen}
+            value={selectedEvent}
+            items={events.map((event) => ({ label: event, value: event }))}
+            setOpen={setEventOpen}
+            setValue={setSelectedEvent}
+            containerStyle={{ marginBottom: 16 }}
+            dropDownContainerStyle={{ maxHeight: 150 }}
+            zIndex={1000}
+            zIndexInverse={3000}
+            dropDownDirection="BOTTOM"
+            listMode="SCROLLVIEW"
+          />
+
+          {/* Navigate to Home */}
+
+          <TouchableOpacity
+            // onPress={() => navigation.navigate("Home")}
+            style={[styles.button, styles.submitButton]}
+          >
+            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Add item to dressing</Text>
+          </TouchableOpacity>
+
           {/* Navigate to Home */}
 
           <TouchableOpacity
@@ -126,6 +253,8 @@ export default function addItem({ navigation }) {
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>Go back Home</Text>
           </TouchableOpacity>
+
+          {/* Modal*/}
 
           <Modal
             visible={modalPhotoVisible}
@@ -264,5 +393,32 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 16,
+  },
+  categories: {
+    marginTop: 12,
+  },
+  categoryBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    marginRight: 8,
+  },
+  input: {
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 10,
+    height: 48,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    fontSize: 16,
+    color: "#111827",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 3,
   },
 });
