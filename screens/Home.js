@@ -154,59 +154,30 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
             <Text style={styles.sectionTitle}>Recent Styles</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {user.outfits.map((style, id) => (
-<<<<<<< HEAD
                 <View key={id}>
-                    {style.outfitPic ? (
-                      <TouchableOpacity
-                  style={styles.outfitCard}
-                  onPress={() => setSelectedOutfit(id)}
-                >
-                          <Image
-                            source={{
-                              uri: style.outfitPic,
-                            }}
-                            style={styles.outfitImage}
-                            resizeMode="cover"
-                          />
-                      <View style={styles.badge}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={styles.badgeText}>{style.rating}</Text>
-                          </View>
-                          </TouchableOpacity>
-                    ): (
-              <TouchableOpacity
-                  style={styles.outfitCard}
-                  onPress={() => setSelectedOutfit(id)}
-                > 
-                <View style={styles.badge}>
-=======
-                <View>
                   {style.outfitPic ? (
                     <TouchableOpacity
-                      key={id}
                       style={styles.outfitCard}
-                      onPress={() => setSelectedOutfit(style.id)}
+                      onPress={() => setSelectedOutfit(id)}
                     >
+                      <Image
+                        source={{
+                          uri: style.outfitPic,
+                        }}
+                        style={styles.outfitImage}
+                        resizeMode="cover"
+                      />
                       <View style={styles.badge}>
                         <Ionicons name="star" size={12} color="#fff" />
                         <Text style={styles.badgeText}>{style.rating}</Text>
-                        <Image
-                          source={{
-                            uri: style.outfitPic,
-                          }}
-                          style={styles.badge}
-                          resizeMode="cover"
-                        />
                       </View>
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
-                      key={id}
                       style={styles.outfitCard}
-                      onPress={() => setSelectedOutfit(style.id)}
+                      onPress={() => setSelectedOutfit(id)}
                     >
                       <View style={styles.badge}>
->>>>>>> ff455910284da585bd155e517946ac55af3cf970
                         <Ionicons name="star" size={12} color="#fff" />
                         <Text style={styles.badgeText}>{style.rating}</Text>
                         <Text style={styles.outfitLabel}>Outfit</Text>
@@ -216,60 +187,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                 </View>
               ))}
             </ScrollView>
-<<<<<<< HEAD
-          
-        
-=======
 
-            {/* Recent Styles */}
-            <Text style={styles.sectionTitle}>Recent Styles</Text>
-            {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {user.outfits.map((style, id) => (
-            <TouchableOpacity
-              key={id}
-              style={styles.outfitCard}
-              onPress={() => setSelectedOutfit(id)}
-            >
-              {style.outfitPic? ( <Image  source={{
-                    uri: style.outfitPic
-                  }}
-                  style={styles.outfitCard}
-                  resizeMode="cover"
-                />) :( <View style={styles.badge}>
-                        <Ionicons name="star" size={12} color="#fff" />
-                        <Text style={styles.badgeText}>{style.rating}</Text>
-                        <Text style={styles.outfitLabel}>Outfit</Text>
-                      </View>
-              )}
-              
-            </TouchableOpacity>
-          ))}
-        </ScrollView> */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {user.outfits.map((style, id) => (
-                <TouchableOpacity
-                  key={id} // ✅ clé unique
-                  style={styles.outfitCard}
-                  onPress={() => setSelectedOutfit(id)} // ✅ meilleure référence que l’index
-                >
-                  {style.outfitPic ? (
-                    <Image
-                      source={{ uri: style.outfitPic }}
-                      style={styles.outfitImage} // ✅ style séparé pour l’image
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={styles.badge}>
-                      <Ionicons name="star" size={12} color="#fff" />
-                      <Text style={styles.badgeText}>{style.rating}</Text>
-                      <Text style={styles.outfitLabel}>Outfit</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
->>>>>>> ff455910284da585bd155e517946ac55af3cf970
             {/* My Virtual Closet */}
             <Text style={styles.sectionTitle}>My Virtual Closet</Text>
             <View style={styles.closetGrid}>
@@ -345,9 +263,6 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
     </SafeAreaProvider>
   );
 }
-
-<<<<<<< HEAD
-)};
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
@@ -549,217 +464,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 20,
   },
-  modalButtonText: { color: '#fff', fontWeight: 'bold' },
+  modalButtonText: { color: "#fff", fontWeight: "bold" },
   outfitImage: {
-  position: "absolute",
-  width: "100%",
-  height: "100%",
-  borderRadius: 12,
-},
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+  },
 });
-=======
-{
-  const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#fff" },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      padding: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: "#e5e7eb",
-    },
-    title: { fontSize: 20, fontWeight: "700", color: "#00A896" },
-    subtitle: { fontSize: 14, color: "#6b7280" },
-    icons: { flexDirection: "row", gap: 8 },
-    iconButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: "#f3f4f6",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    deleteIcon: {
-      flexDirection: "row", // ✅ Disposition horizontale
-      justifyContent: "flex-end", // ✅ Aligner à droite
-      width: "100%",
-      marginBottom: 8,
-      paddingRight: 5,
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.5)",
-    },
-    modalContent: {
-      backgroundColor: "#fff",
-      padding: 20,
-      borderRadius: 12,
-      alignItems: "center",
-      width: "80%",
-    },
-    modalText: { fontSize: 16, marginBottom: 20, textAlign: "center" },
-    modalTitle: {
-      fontSize: 16,
-      marginBottom: 20,
-      textAlign: "center",
-      fontWeight: "500",
-    },
-    modalButton: {
-      backgroundColor: "#00A896",
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      borderRadius: 8,
-    },
-    modalButtonText: { color: "#fff", fontWeight: "600" },
-    container: {
-      flex: 1,
-      backgroundColor: "#F8F8F8",
-    },
-    header: {
-      backgroundColor: "#fff",
-      padding: 24,
-      borderBottomWidth: 1,
-      borderColor: "#E0E0E0",
-    },
-    headerTop: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: "#80CBC4",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    avatarText: { color: "#fff", fontWeight: "bold", fontSize: 18 },
-    notificationDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: "#4DB6AC",
-      position: "absolute",
-      top: 0,
-      right: 0,
-    },
-    greeting: { fontSize: 18, color: "#222", marginVertical: 12 },
-    infoRow: { flexDirection: "row", gap: 16 },
-    infoItem: { flexDirection: "row", alignItems: "center", gap: 6 },
-    infoText: { color: "#777" },
-    content: { padding: 20 },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: "#222",
-      marginVertical: 12,
-    },
-    outfitCard: {
-      width: 120,
-      height: 160,
-      borderRadius: 12,
-      backgroundColor: "#E9F5F2",
-      marginRight: 12,
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-    },
-    outfitLabel: { color: "#555" },
-    badge: {
-      position: "absolute",
-      top: 8,
-      right: 8,
-      flexDirection: "row",
-      backgroundColor: "#4DB6AC",
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: 8,
-      alignItems: "center",
-    },
-    badgeText: { color: "#fff", fontSize: 12, marginLeft: 3 },
-    closetGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-    closetItem: {
-      width: "30%",
-      aspectRatio: 1,
-      backgroundColor: "#fff",
-      borderRadius: 12,
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: 12,
-      shadowColor: "#000",
-      shadowOpacity: 0.1,
-      shadowRadius: 3,
-    },
-    closetPreview: {
-      width: "80%",
-      height: 50,
-      borderRadius: 8,
-      backgroundColor: "#E9F5F2",
-      marginBottom: 8,
-    },
-    closetLabel: { fontSize: 12, color: "#A1887F" },
-    calendarCard: {
-      backgroundColor: "#fff",
-      borderRadius: 12,
-      padding: 16,
-      shadowColor: "#000",
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-    },
-    calendarTitle: { textAlign: "center", fontWeight: "600", marginBottom: 8 },
-    calendarDaysRow: { flexDirection: "row", justifyContent: "space-between" },
-    calendarDayLabel: { color: "#888", width: 28, textAlign: "center" },
-    calendarGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-      marginTop: 8,
-    },
-    calendarCell: {
-      width: 28,
-      height: 28,
-      borderRadius: 6,
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: 6,
-    },
-    calendarActiveCell: { backgroundColor: "#4DB6AC" },
-    calendarPastCell: { backgroundColor: "#EEE" },
-    calendarCellText: { fontSize: 12, color: "#999" },
-    calendarActiveText: { color: "#fff" },
-    calendarPastText: { color: "#333" },
-    modalContainer: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.4)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    modalBox: {
-      width: "80%",
-      backgroundColor: "#fff",
-      padding: 20,
-      borderRadius: 12,
-      alignItems: "center",
-    },
-    modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 8 },
-    modalText: { color: "#555", marginBottom: 20 },
-    modalButton: {
-      backgroundColor: "#4DB6AC",
-      borderRadius: 8,
-      paddingVertical: 8,
-      paddingHorizontal: 20,
-    },
-    modalButtonText: { color: "#fff", fontWeight: "bold" },
-  });
-}
->>>>>>> ff455910284da585bd155e517946ac55af3cf970

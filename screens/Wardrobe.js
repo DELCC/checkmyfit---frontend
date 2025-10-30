@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   View,
   Text,
@@ -7,13 +8,11 @@ import {
   FlatList,
   StyleSheet,
   Modal,
+  Image,
 } from "react-native";
-import { Filter, Plus } from "lucide-react-native";
-import { ClosetItemModal } from "../components/ClosetItemModal";
+import { Filter, Plus, X } from "lucide-react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Bell, Settings } from "lucide-react-native";
-import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
-import CameraViewStyle from "../components/CameraViewStyle";
+import { useFocusEffect } from "@react-navigation/native";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
@@ -29,35 +28,72 @@ const closetCategories = [
 ];
 
 export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
+  const [itemsdata, setItemsData] = useState([]);
+  const token = useSelector((state) => state.users.value.token);
+  console.log(`Token dispo dans addItem ${token}`);
+
+  // State for category clothes selection
   const [selectedCategory, setSelectedCategory] = useState(
     initialCategory || "All"
   );
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // const ipAdress = "192.168.100.144:3000";
+  // Fetch items from backend API on component mount and when itemsdata changes
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!token) return;
+      fetch(`${API_IP}:${API_PORT}/items/${token}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            setItemsData(data.items);
+          } else {
+            console.log("Error fetching items:", data.error);
+          }
+        })
+        .catch((error) => {
+          console.log("Network error fetching items:", error);
+        });
+    }, [])
+  );
+  console.log("Fetched items data:", itemsdata);
 
-  const items = Array.from({ length: 18 }, (_, i) => ({
-    id: i + 1,
-    category: closetCategories[(i % 6) + 1],
-  }));
-
+  // Use real items from backend state
   const filteredItems =
     selectedCategory === "All"
-      ? items
-      : items.filter((item) => item.category === selectedCategory);
+      ? itemsdata
+      : (itemsdata || []).filter((item) => {
+          if (!item) return false;
+          // match by type (case-insensitive)
+          return (
+            (item.type && item.type.toLowerCase()) ===
+            selectedCategory.toLowerCase()
+          );
+        });
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => setSelectedItem(item)}>
-      <View style={styles.itemSquare} />
-      <View style={styles.badgeContainer}>
-        <View style={[styles.badge, { borderColor: "#D2B48C" }]}>
-          <Text style={{ color: "#D2B48C", fontSize: 12 }}>
-            {item.category}
-          </Text>
+  // Display each item card with image and type
+  const renderItem = ({ item }) => {
+    console.log(`item: ${item._id}`);
+    const imageUri = item.itemPic || null;
+    const typeLabel = item.type || "Unknown";
+
+    return (
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => setSelectedItem(item)}
+      >
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.itemImage} />
+        ) : (
+          <View style={[styles.itemSquare, styles.placeholderSquare]} />
+        )}
+
+        <View style={styles.cardFooter}>
+          <Text style={styles.typeText}>{typeLabel}</Text>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaProvider>
@@ -111,22 +147,112 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
         </View>
 
         {/* Items Grid */}
-        <FlatList
-          data={filteredItems}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={3}
-          contentContainerStyle={styles.itemsGrid}
-        />
+        {!itemsdata || itemsdata.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              Your virtual dressing is empty. Add your first item!
+            </Text>
+            <TouchableOpacity
+              style={styles.addItemButton}
+              onPress={() => navigation.navigate("addItem")}
+            >
+              <Text style={styles.addItemButtonText}>Add item</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredItems}
+            renderItem={renderItem}
+            keyExtractor={(item) => (item._id ? item._id : String(item.id))}
+            numColumns={3}
+            contentContainerStyle={styles.itemsGrid}
+          />
+        )}
 
         {/* Closet Item Modal */}
-        {/* <ClosetItemModal
-        isOpen={selectedItem !== null}
-        onClose={() => setSelectedItem(null)}
-        onModify={() => setSelectedItem(null)}
-        onDelete={() => setSelectedItem(null)}
-        item={selectedItem || undefined}
-      /> */}
+        <Modal
+          visible={selectedItem !== null}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setSelectedItem(null)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <TouchableOpacity
+                style={styles.modalClose}
+                onPress={() => setSelectedItem(null)}
+              >
+                <X width={20} height={20} />
+              </TouchableOpacity>
+
+              {/* Image */}
+              {selectedItem && selectedItem.itemPic ? (
+                <Image
+                  source={{ uri: selectedItem.itemPic }}
+                  style={styles.modalImage}
+                />
+              ) : (
+                <View style={[styles.modalImage, styles.placeholderSquare]} />
+              )}
+
+              {/* Info rows */}
+              <View style={styles.infoContainer}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Type:</Text>
+                  <Text style={styles.infoValue}>
+                    {(selectedItem && selectedItem.type) == null
+                      ? "undefined"
+                      : selectedItem.type}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Color:</Text>
+                  <Text style={styles.infoValue}>
+                    {(selectedItem && selectedItem.color) == null
+                      ? "undefined"
+                      : selectedItem.color}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Season:</Text>
+                  <Text style={styles.infoValue}>
+                    {(selectedItem && selectedItem.season) == null
+                      ? "undefined"
+                      : selectedItem.season}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Occasion:</Text>
+                  <Text style={styles.infoValue}>
+                    {(selectedItem && selectedItem.occasion) == null
+                      ? "undefined"
+                      : selectedItem.occasion}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Modal Buttons */}
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.deleteButton]}
+                  onPress={() => {}}
+                >
+                  <Text style={styles.buttonText}>Delete</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.editButton]}
+                  onPress={() => {}}
+                >
+                  <Text style={styles.buttonText}>Edit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -206,5 +332,114 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 8,
     borderWidth: 1,
+  },
+  itemImage: {
+    width: "100%",
+    aspectRatio: 1,
+    resizeMode: "cover",
+  },
+  placeholderSquare: {
+    backgroundColor: "#E0D7F9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardFooter: {
+    padding: 8,
+    alignItems: "center",
+  },
+  typeText: {
+    fontSize: 12,
+    color: "#374151",
+    fontWeight: "600",
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#6b7280",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  addItemButton: {
+    backgroundColor: "#6C5DD3",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  addItemButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  modalBox: {
+    width: "100%",
+    maxWidth: 560,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    position: "relative",
+  },
+  modalClose: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    padding: 6,
+  },
+  modalImage: {
+    width: "100%",
+    height: 220,
+    borderRadius: 8,
+    backgroundColor: "#F3F4F6",
+    marginBottom: 12,
+  },
+  infoContainer: {
+    marginBottom: 12,
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  infoLabel: {
+    color: "#6b7280",
+    fontWeight: "600",
+  },
+  infoValue: {
+    color: "#111827",
+    fontWeight: "700",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  deleteButton: {
+    backgroundColor: "#F44336",
+  },
+  editButton: {
+    backgroundColor: "#6C5DD3",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
