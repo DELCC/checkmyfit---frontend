@@ -89,7 +89,8 @@ export default function AIStylist() {
               setStyleComments(AIResultObject.comment);
               setImprovementSuggestions(AIResultObject.suggestions);
             })
-            .catch((error) => {console.log(error);
+            .catch((error) => {
+              console.log(error);
               setModalResultVisible(false);
             });
           // .catch((error) => console.log(error));
@@ -107,7 +108,7 @@ export default function AIStylist() {
   const user = useSelector((state) => state.users.value);
 
   const saveOutfit = () => {
-    fetch(`${API_IP}/outfits/${user.token}`, {
+    fetch(`${IP_ADDRESS}:${API_PORT}/outfits/${user.token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
