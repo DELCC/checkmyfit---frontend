@@ -130,6 +130,7 @@ export default function AIStylist() {
         suggestion: improvementSuggestions,
       })
     );
+    setModalResultVisible(false);
   };
 
   return (

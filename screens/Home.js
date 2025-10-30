@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
 import { addOutfit, updateUser } from "../reducers/users";
+import * as Location from "expo-location";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
@@ -21,6 +22,12 @@ const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   const [modalVisible, setModalVisible] = useState(true);
   const [selectedOutfit, setSelectedOutfit] = useState(null);
+  const [city, setCity] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [lat, setLat] = useState("null");
+  const [lon, setLon] = useState("null");
+
   useEffect(() => {
     if (route.params?.isNewUser) {
       setModalVisible(true);
@@ -70,6 +77,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
             height: data.user.height,
             weight: data.user.weight,
             stylePreferences: data.user.stylePreferences,
+            aiAssistant: data.user.aiAssistant,
           })
         );
       })
@@ -104,6 +112,34 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
     //   .then( data => console.log(data));
   }, []);
   console.log(user);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission refusée pour accéder à la localisation.");
+        setLoading(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      setLat(latitude);
+      setLon(longitude);
+      const reverseGeocode = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      if (reverseGeocode.length > 0) {
+        const address = reverseGeocode[0];
+        setCity(address.city || address.region || "Ville inconnue");
+      }
+
+      setLoading(false);
+    })();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -154,6 +190,12 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
               <View style={styles.infoItem}>
                 <Ionicons name="calendar-outline" size={16} color="#666" />
                 <Text style={styles.infoText}>Mon, Oct 20</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="location-outline" size={16} color="#4DB6AC" />
+                <Text style={styles.infoText}>
+                  {loading ? "Chargement..." : city || "Ville inconnue"}
+                </Text>
               </View>
             </View>
           </View>
@@ -363,7 +405,13 @@ const styles = StyleSheet.create({
     right: 0,
   },
   greeting: { fontSize: 18, color: "#222", marginVertical: 12 },
-  infoRow: { flexDirection: "row", gap: 16 },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    rowGap: 8,
+  },
   infoItem: { flexDirection: "row", alignItems: "center", gap: 6 },
   infoText: { color: "#777" },
   content: { padding: 20 },
