@@ -13,8 +13,9 @@ import { Bell, Settings, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
-import { addOutfit, updateUser } from "../reducers/users";
+import { addOutfit, updateUser, deleteOutfit } from "../reducers/users";
 import * as Location from "expo-location";
+import OutfitDisplay from "../components/OutfitDisplay";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
@@ -27,6 +28,10 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [lat, setLat] = useState("null");
   const [lon, setLon] = useState("null");
+  const [starRate, setStarRate] = useState("");
+  const [styleComments, setStyleComments] = useState("");
+  const [improvementSuggestions, setImprovementSuggestions] = useState([]);
+  const [picture, setPicture] = useState("");
 
   useEffect(() => {
     if (route.params?.isNewUser) {
@@ -53,12 +58,16 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   // ];
 
   const closetItems = [
-    { id: 1, category: "Tops" },
-    { id: 2, category: "Bottoms" },
-    { id: 3, category: "Shoes" },
-    { id: 4, category: "Accessories" },
-    { id: 5, category: "Outerwear" },
-    { id: 6, category: "Dresses" },
+    { id: 1, category: "Tops", image: require("../assets/tops.png") },
+    { id: 2, category: "Bottoms", image: require("../assets/bottoms.png") },
+    { id: 3, category: "Shoes", image: require("../assets/shoes.png") },
+    {
+      id: 4,
+      category: "Accessories",
+      image: require("../assets/accessories.png"),
+    },
+    // { id: 5, category: "Outerwear", image: require("../assets/outerwear.png") },
+    // { id: 6, category: "Dresses", image: require("../assets/dresses.png") },
   ];
 
   const dispatch = useDispatch();
@@ -78,6 +87,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
             weight: data.user.weight,
             stylePreferences: data.user.stylePreferences,
             aiAssistant: data.user.aiAssistant,
+            profilePic: data.user.profilePic,
           })
         );
       })
@@ -98,6 +108,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
         for (let i = 0; i < data["outfits"].length; i++) {
           dispatch(
             addOutfit({
+              id: data["outfits"][i]["_id"],
               outfitPic: data["outfits"][i]["outfitPic"],
               rating: data["outfits"][i]["rating"],
               comment: data["outfits"][i]["comment"],
@@ -112,6 +123,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
     //   .then( data => console.log(data));
   }, []);
   console.log(user);
+  console.log(selectedOutfit);
 
   useEffect(() => {
     (async () => {
@@ -139,6 +151,34 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
       setLoading(false);
     })();
   }, []);
+
+  const handleDisplayOutfit = async (id) => {
+    setSelectedOutfit(id);
+    const selectedOutfitInfos = await user.outfits.find((e) => e.id === id);
+    console.log(selectedOutfitInfos);
+    setStarRate(selectedOutfitInfos.rating);
+    setStyleComments(selectedOutfitInfos.comment);
+    setImprovementSuggestions(selectedOutfitInfos.suggestion);
+    setPicture(selectedOutfitInfos.outfitPic);
+  };
+
+  const handleCloseDisplayOutfit = () => {
+    setStarRate("");
+    setStyleComments("");
+    setImprovementSuggestions([]);
+    setPicture("");
+    setSelectedOutfit(null);
+  };
+
+  const handleDeleteOutfit = (id) => {
+    fetch(`${API_IP}:${API_PORT}/outfits/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(() => dispatch(deleteOutfit(id)))
+      .then(() => handleCloseDisplayOutfit(id))
+      .catch((error) => console.log(error));
+  };
 
   return (
     <SafeAreaProvider>
@@ -206,12 +246,12 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
           >
             <Text style={styles.sectionTitle}>Recent Styles</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {user.outfits.map((style, id) => (
-                <View key={id}>
+              {user.outfits.map((style) => (
+                <View key={style.id}>
                   {style.outfitPic ? (
                     <TouchableOpacity
                       style={styles.outfitCard}
-                      onPress={() => setSelectedOutfit(id)}
+                      onPress={() => handleDisplayOutfit(style.id)}
                     >
                       <Image
                         source={{
@@ -228,7 +268,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                   ) : (
                     <TouchableOpacity
                       style={styles.outfitCard}
-                      onPress={() => setSelectedOutfit(id)}
+                      onPress={() => handleDisplayOutfit(style.id)}
                     >
                       <View style={styles.badge}>
                         <Ionicons name="star" size={12} color="#fff" />
@@ -250,7 +290,12 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                   style={styles.closetItem}
                   onPress={() => onNavigateToCloset(item.category)}
                 >
-                  <View style={styles.closetPreview} />
+                  <Image
+                    source={item.image}
+                    style={styles.itemImage}
+                    resizeMode="cover"
+                  />
+                  {/* <View style={styles.closetPreview} /> */}
                   <Text style={styles.closetLabel}>{item.category}</Text>
                 </TouchableOpacity>
               ))}
@@ -296,7 +341,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
             animationType="slide"
             transparent
           >
-            <View style={styles.modalContainer}>
+            {/* <View style={styles.modalContainer}>
               <View style={styles.modalBox}>
                 <Text style={styles.modalTitle}>Outfit Feedback</Text>
                 <Text style={styles.modalText}>
@@ -309,7 +354,16 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                   <Text style={styles.modalButtonText}>Close</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
+            <OutfitDisplay
+              selectedOutfit={selectedOutfit}
+              onClose={() => handleCloseDisplayOutfit()}
+              picture={picture}
+              starRate={starRate}
+              styleComments={styleComments}
+              improvementSuggestions={improvementSuggestions}
+              deleteOutfit={() => handleDeleteOutfit(selectedOutfit)}
+            />
           </Modal>
         </View>
       </SafeAreaView>
@@ -528,5 +582,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 12,
+  },
+  itemImage: {
+    width: "75%",
+    height: "65%",
+    borderRadius: 10,
+    marginBottom: 6,
   },
 });
