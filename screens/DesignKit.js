@@ -154,7 +154,25 @@ export default function DesignKit({ navigation }) {
                   Primary Button
                 </Text>
               </TouchableOpacity>
+
               {/* </LinearGradient> */}
+              <LinearGradient
+                colors={["#007F8C", "#00C896"]} // gradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.saveButton}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                </TouchableOpacity>
+              </LinearGradient>
 
               {/* Secondary Button */}
               <TouchableOpacity style={[styles.button, styles.secondaryButton]}>
@@ -514,5 +532,16 @@ const styles = StyleSheet.create({
   cardsContainer: {
     flexDirection: "column",
     gap: 16, // espacement vertical entre les cartes
+  },
+  saveButton: {
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 24,
+  },
+  saveButtonText: {
+    color: "#ffffffff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

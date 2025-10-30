@@ -11,7 +11,6 @@ import {
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { launchImageLibrary } from "react-native-image-picker";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ArrowLeft, Camera, Sparkles } from "lucide-react-native";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,8 +18,6 @@ import { updateUser } from "../reducers/users";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import ImagePickerField from "../components/uploadPic";
-
-// const ipAdress = "192.168.100.171:3000";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
@@ -68,7 +65,7 @@ export default function EditProfile({
 
   useEffect(() => {
     if (user.infoUser) {
-      setProfileImage(user.infoUser.profileImage || null);
+      setProfileImage(user.infoUser.profilePic || null);
       setBio(user.infoUser.bio || "");
       setHeight(user.infoUser.height?.toString() || "");
       setWeight(user.infoUser.weight?.toString() || "");
@@ -103,7 +100,7 @@ export default function EditProfile({
           dispatch(
             updateUser({
               aiAssistant: data.user.aiAssistant,
-              userName: data.user.username,
+              username: userData.username,
               profilePic: data.user.profilePic,
               bio: data.user.bio,
               bodyType: data.user.bodyType,
@@ -141,7 +138,7 @@ export default function EditProfile({
           if (data.result) {
             const cloudUrl = data.url;
 
-            // Now save this Cloudinary URL to your user profile
+            // Save Cloudinary URL
             return fetch(`${API_IP}:${API_PORT}/users/${user.token}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
@@ -183,7 +180,7 @@ export default function EditProfile({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Header */}
+          {/* Header ------------------*/}
           <View style={styles.header}>
             {!route.params?.isNewUser && onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backButton}>
@@ -233,7 +230,7 @@ export default function EditProfile({
                     ]}
                   >
                     <LinearGradient
-                      colors={["#3399FF", "#00C896"]} //COLOR GRADIENT
+                      colors={["#3399FF", "#00C896"]} // COLOR GRADIENT
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                       style={styles.aiAvatarWrapper}
@@ -295,9 +292,6 @@ export default function EditProfile({
               style={styles.input}
               value={bio}
               onChangeText={setBio}
-              // placeholder={
-              //   userData.bio?.toString() || "Tell us about your style..."
-              // }
               multiline
               numberOfLines={3}
             />
@@ -308,7 +302,6 @@ export default function EditProfile({
               style={styles.input}
               value={height}
               onChangeText={setHeight}
-              // placeholder={userData.height?.toString() || "180"}
             />
 
             {/* Weight ---------------------- */}
@@ -317,7 +310,6 @@ export default function EditProfile({
               style={styles.input}
               value={weight}
               onChangeText={setWeight}
-              // placeholder={userData.weight?.toString() || "80"}
               keyboardType="numeric"
             />
 
@@ -377,10 +369,10 @@ export default function EditProfile({
 
             {/* Save Btn ---------------------- */}
             <LinearGradient
-              colors={["#007F8C", "#00C896"]} // your gradient
+              colors={["#007F8C", "#00C896"]} // gradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.saveButton} // same style as before
+              style={styles.saveButton}
             >
               <TouchableOpacity
                 onPress={handleEdit}
@@ -397,7 +389,6 @@ export default function EditProfile({
               </TouchableOpacity>
             </LinearGradient>
           </View>
-          {/* </View> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -440,7 +431,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   editSection: {
-    // flex: 1,
     padding: 15,
   },
   section: {
@@ -551,51 +541,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-
-  // CSS for Assistant
-  // assistantSection: {
-  //   backgroundColor: "#FAFAF9",
-  //   marginTop: 30,
-  //   marginBottom: 40,
-  // },
-  // sectionTitle: {
-  //   fontSize: 18,
-  //   fontWeight: "600",
-  //   color: "#111827",
-  //   marginBottom: 16,
-  // },
-  // assistantCard: {
-  //   backgroundColor: "#FFFFFF",
-  //   borderRadius: 16,
-  //   padding: 16,
-  //   marginBottom: 16,
-  //   shadowColor: "#000",
-  //   shadowOpacity: 0.08,
-  //   shadowRadius: 6,
-  //   elevation: 3,
-  // },
-  // assistantInfo: {
-  //   flexDirection: "row",
-  //   alignItems: "flex-start",
-  //   marginBottom: 12,
-  // },
-  // assistantAvatar: {
-  //   width: 64,
-  //   height: 64,
-  //   borderRadius: 32,
-  //   marginRight: 16,
-  //   backgroundColor: "#E5E7EB",
-  // },
-  // assistantName: {
-  //   fontSize: 16,
-  //   fontWeight: "600",
-  //   color: "#111827",
-  // },
-  // assistantDescription: {
-  //   fontSize: 14,
-  //   color: "#6B7280",
-  //   marginTop: 4,
-  // },
   styleTagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -614,26 +559,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#027f8c",
   },
-  // selectButton: {
-  //   alignSelf: "flex-end",
-  //   borderWidth: 1,
-  //   borderColor: "#10B981",
-  //   borderRadius: 8,
-  //   paddingVertical: 6,
-  //   paddingHorizontal: 16,
-  // },
-  // selectButtonText: {
-  //   color: "#10B981",
-  //   fontWeight: "600",
-  // },
-  // selectButtonActive: {
-  //   backgroundColor: "#10B981",
-  // },
-  // selectButtonTextActive: {
-  //   color: "#FFFFFF",
-  // },
-
-  // new ai assist
+  // new ai assistant
   aiSection: {
     padding: 20,
     backgroundColor: "#FAFAF9",
@@ -680,13 +606,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   aiAvatarWrapper: {
-    // width: 64,
-    // height: 64,
-    // borderRadius: 32,
-    // overflow: "hidden",
-    // borderWidth: 2,
-    // justifyContent: "center",
-    // alignItems: "center",
     width: 64,
     height: 64,
     borderRadius: 32,
