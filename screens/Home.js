@@ -33,6 +33,9 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   const [improvementSuggestions, setImprovementSuggestions] = useState([]);
   const [picture, setPicture] = useState("");
 
+  const date = new Date();
+  const displayDate =
+    date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
   useEffect(() => {
     if (route.params?.isNewUser) {
       setModalVisible(true);
@@ -229,7 +232,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="calendar-outline" size={16} color="#666" />
-                <Text style={styles.infoText}>Mon, Oct 20</Text>
+                <Text style={styles.infoText}>{displayDate}</Text>
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="location-outline" size={16} color="#4DB6AC" />

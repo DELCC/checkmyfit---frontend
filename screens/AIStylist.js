@@ -120,16 +120,17 @@ export default function AIStylist() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-      });
-    dispatch(
-      addOutfit({
-        outfitPic: picture,
-        rating: starRate,
-        comment: styleComments,
-        suggestion: improvementSuggestions,
+        dispatch(
+          addOutfit({
+            id: data.outfit._id,
+            outfitPic: picture,
+            rating: starRate,
+            comment: styleComments,
+            suggestion: improvementSuggestions,
+          })
+        );
       })
-    );
+      .catch((error) => console.log(error));
     setModalResultVisible(false);
   };
 
