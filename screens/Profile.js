@@ -2,11 +2,6 @@
 // import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 // import { Bell, Settings } from "lucide-react-native";
 // import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../reducers/users";
-
-const API_IP = process.env.EXPO_PUBLIC_API_IP;
-const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
 // const Stack = createNativeStackNavigator();
 // //gghqsv qqsdqs qsd
@@ -133,29 +128,15 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Edit2, Sparkles, Bell, Settings } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../reducers/users";
 
-// export default function Profile({ navigation }) {
-
-// useEffect(() => {
-//   fetch(`${API_IP}:${API_PORT}/users/${token}`)
-//     .then((res) => res.json())
-//     .then((data) => {
-//       if (data.result && data.user) {
-//         console.log(data.user);
-//         setUserData(data.user);
-//         console.log("userdata", userData);
-//         console.log("username", data.user.username);
-//         console.log("bio", data.user.bio);
-//       }
-//     })
-//     .catch((err) => console.error("Fetch user error:", err));
-// }, []);
+const API_IP = process.env.EXPO_PUBLIC_API_IP;
+const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
 export default function Profile({ navigation }) {
   const dispatch = useDispatch();
-  // const token = useSelector((state) => state.users.value.token);
-
-  const user = useSelector((state) => state.users.value); // main user info
+  const user = useSelector((state) => state.users.value);
   const userData = user.infoUser;
   // mockdata -------- !!!!!!!
   // const [userData, setUserData] = useState({
@@ -217,7 +198,7 @@ export default function Profile({ navigation }) {
               )}
             </LinearGradient>
 
-            <Text style={styles.name}>{userData.username}</Text>
+            <Text style={styles.name}>{userData?.username || "Anonymous"}</Text>
             <Text style={styles.bio}>{userData.bio || "No bio yet"}</Text>
 
             <TouchableOpacity

@@ -47,27 +47,37 @@ export default function EditProfile({
   navigation,
   route,
 }) {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.users.value);
+  const userData = user.infoUser;
+
   const [profileImage, setProfileImage] = useState(null);
-  const [bio, setBio] = useState("Fashion enthusiast");
-  const [height, setHeight] = useState("180");
-  const [weight, setWeight] = useState("80");
-  const [bodyType, setBodyType] = useState("Athletic");
-  const [skinTone, setSkinTone] = useState("Medium");
-  const [stylePreferences, setStylePreferences] = useState([
-    "Minimal",
-    "Modern",
-    "Casual",
-  ]);
+  const [bio, setBio] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bodyType, setBodyType] = useState("");
+  const [skinTone, setSkinTone] = useState("");
+  const [stylePreferences, setStylePreferences] = useState([]);
 
   const [bodyOpen, setBodyOpen] = useState(false);
   const [skinOpen, setSkinOpen] = useState(false);
   const [styleOpen, setStyleOpen] = useState(false);
 
   const [assistants, setAssistants] = useState([]);
-  const [selectedAssistant, setSelectedAssistant] = useState(null);
+  const [selectedAssistant, setSelectedAssistant] = useState();
 
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.users.value);
+  useEffect(() => {
+    if (user.infoUser) {
+      setProfileImage(user.infoUser.profileImage || null);
+      setBio(user.infoUser.bio || "");
+      setHeight(user.infoUser.height?.toString() || "");
+      setWeight(user.infoUser.weight?.toString() || "");
+      setBodyType(user.infoUser.bodyType || "");
+      setSkinTone(user.infoUser.skinTone || "");
+      setStylePreferences(user.infoUser.stylePreferences || []);
+      setSelectedAssistant(user.infoUser.aiAssistant?._id || null);
+    }
+  }, [user.infoUser]);
 
   // -------- EDIT PROFILE IN DB
   const handleEdit = () => {
@@ -92,8 +102,9 @@ export default function EditProfile({
         if (data) {
           dispatch(
             updateUser({
-              aiAssistant: data.user.selectedAssistant,
-              profilePic: data.user.profileImage,
+              aiAssistant: data.user.aiAssistant,
+              userName: data.user.username,
+              profilePic: data.user.profilePic,
               bio: data.user.bio,
               bodyType: data.user.bodyType,
               weight: data.user.weight,
@@ -103,7 +114,7 @@ export default function EditProfile({
               profilePic: data.user.profilePic,
             })
           );
-          console.log(data);
+          console.log("hello", data);
         }
       })
       .catch(() => console.log("error"));
@@ -284,7 +295,9 @@ export default function EditProfile({
               style={styles.input}
               value={bio}
               onChangeText={setBio}
-              placeholder="Tell us about your style..."
+              // placeholder={
+              //   userData.bio?.toString() || "Tell us about your style..."
+              // }
               multiline
               numberOfLines={3}
             />
@@ -295,7 +308,7 @@ export default function EditProfile({
               style={styles.input}
               value={height}
               onChangeText={setHeight}
-              placeholder="180"
+              // placeholder={userData.height?.toString() || "180"}
             />
 
             {/* Weight ---------------------- */}
@@ -304,7 +317,7 @@ export default function EditProfile({
               style={styles.input}
               value={weight}
               onChangeText={setWeight}
-              placeholder="80"
+              // placeholder={userData.weight?.toString() || "80"}
               keyboardType="numeric"
             />
 
