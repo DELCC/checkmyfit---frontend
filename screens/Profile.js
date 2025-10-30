@@ -153,21 +153,24 @@ import { Edit2, Sparkles, Bell, Settings } from "lucide-react-native";
 
 export default function Profile({ navigation }) {
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.users.value.token);
+  // const token = useSelector((state) => state.users.value.token);
+
+  const user = useSelector((state) => state.users.value); // main user info
+  const userData = user.infoUser;
   // mockdata -------- !!!!!!!
-  const [userData, setUserData] = useState({
-    username: "Hana",
-    bio: "Fashion enthusiast | Minimal style lover",
-    profilePic: null, // replace with URL if available
-    height: 170,
-    skinTone: "Medium",
-    bodyType: "Athletic",
-    stylePreferences: ["Minimal", "Modern", "Casual"],
-    aiAssistant: {
-      aiassistantName: "Yoann",
-      aiassistantStyle: ["Creative", "Friendly"],
-    },
-  });
+  // const [userData, setUserData] = useState({
+  //   username: "Hana",
+  //   bio: "Fashion enthusiast | Minimal style lover",
+  //   profilePic: null, // replace with URL if available
+  //   height: 170,
+  //   skinTone: "Medium",
+  //   bodyType: "Athletic",
+  //   stylePreferences: ["Minimal", "Modern", "Casual"],
+  //   aiAssistant: {
+  //     aiassistantName: "Yoann",
+  //     aiassistantStyle: ["Creative", "Friendly"],
+  //   },
+  // });
 
   const handleLogout = () => {
     dispatch(logout());

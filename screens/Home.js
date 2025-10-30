@@ -13,7 +13,9 @@ import { Bell, Settings, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
-import { addOutfit, updateUser } from "../reducers/users";
+import { addOutfit, updateUser, deleteOutfit } from "../reducers/users";
+import * as Location from "expo-location";
+import OutfitDisplay from "../components/OutfitDisplay";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
@@ -21,6 +23,19 @@ const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   const [modalVisible, setModalVisible] = useState(true);
   const [selectedOutfit, setSelectedOutfit] = useState(null);
+  const [city, setCity] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [lat, setLat] = useState("null");
+  const [lon, setLon] = useState("null");
+  const [starRate, setStarRate] = useState("");
+  const [styleComments, setStyleComments] = useState("");
+  const [improvementSuggestions, setImprovementSuggestions] = useState([]);
+  const [picture, setPicture] = useState("");
+
+  const date = new Date();
+  const displayDate =
+    date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
   useEffect(() => {
     if (route.params?.isNewUser) {
       setModalVisible(true);
@@ -46,12 +61,16 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   // ];
 
   const closetItems = [
-    { id: 1, category: "Tops" },
-    { id: 2, category: "Bottoms" },
-    { id: 3, category: "Shoes" },
-    { id: 4, category: "Accessories" },
-    { id: 5, category: "Outerwear" },
-    { id: 6, category: "Dresses" },
+    { id: 1, category: "Tops", image: require("../assets/tops.png") },
+    { id: 2, category: "Bottoms", image: require("../assets/bottoms.png") },
+    { id: 3, category: "Shoes", image: require("../assets/shoes.png") },
+    {
+      id: 4,
+      category: "Accessories",
+      image: require("../assets/accessories.png"),
+    },
+    // { id: 5, category: "Outerwear", image: require("../assets/outerwear.png") },
+    // { id: 6, category: "Dresses", image: require("../assets/dresses.png") },
   ];
 
   const dispatch = useDispatch();
@@ -70,6 +89,8 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
             height: data.user.height,
             weight: data.user.weight,
             stylePreferences: data.user.stylePreferences,
+            aiAssistant: data.user.aiAssistant,
+            profilePic: data.user.profilePic,
           })
         );
       })
@@ -77,22 +98,91 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
     fetch(`${API_IP}:${API_PORT}/outfits/${user.token}`)
       .then((response) => response.json())
       .then((data) => {
-        data.outfits.map((outfit) => {
-          return dispatch(
+        console.log(data);
+        console.log(data.outfits.length);
+        // data.outfits.map((outfit) => {
+        //   return dispatch(
+        //     addOutfit({
+        //       outfitPic: outfit.outfitPic,
+        //       rating: outfit.rating,
+        //       comment: outfit.comment,
+        //       suggestion: outfit.suggestion,
+        //     })
+        for (let i = 0; i < data["outfits"].length; i++) {
+          dispatch(
             addOutfit({
-              outfitPic: outfit.outfitPic,
-              rating: outfit.rating,
-              comment: outfit.comment,
-              suggestion: outfit.suggestion,
+              id: data["outfits"][i]["_id"],
+              outfitPic: data["outfits"][i]["outfitPic"],
+              rating: data["outfits"][i]["rating"],
+              comment: data["outfits"][i]["comment"],
+              suggestion: data["outfits"][i]["suggestion"],
             })
-          ).cattch((error) => console.log(error));
-        });
-      });
+          );
+        }
+      })
+      .catch((error) => console.log(error));
     // fetch(`http:${IP_ADDRESS}:3000/items/${user.token}`)
     //   .then(response => response.json())
     //   .then( data => console.log(data));
   }, []);
   console.log(user);
+  console.log(selectedOutfit);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission refusée pour accéder à la localisation.");
+        setLoading(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      setLat(latitude);
+      setLon(longitude);
+      const reverseGeocode = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      if (reverseGeocode.length > 0) {
+        const address = reverseGeocode[0];
+        setCity(address.city || address.region || "Ville inconnue");
+      }
+
+      setLoading(false);
+    })();
+  }, []);
+
+  const handleDisplayOutfit = async (id) => {
+    setSelectedOutfit(id);
+    const selectedOutfitInfos = await user.outfits.find((e) => e.id === id);
+    console.log(selectedOutfitInfos);
+    setStarRate(selectedOutfitInfos.rating);
+    setStyleComments(selectedOutfitInfos.comment);
+    setImprovementSuggestions(selectedOutfitInfos.suggestion);
+    setPicture(selectedOutfitInfos.outfitPic);
+  };
+
+  const handleCloseDisplayOutfit = () => {
+    setStarRate("");
+    setStyleComments("");
+    setImprovementSuggestions([]);
+    setPicture("");
+    setSelectedOutfit(null);
+  };
+
+  const handleDeleteOutfit = (id) => {
+    fetch(`${API_IP}:${API_PORT}/outfits/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(() => dispatch(deleteOutfit(id)))
+      .then(() => handleCloseDisplayOutfit(id))
+      .catch((error) => console.log(error));
+  };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -142,7 +232,13 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="calendar-outline" size={16} color="#666" />
-                <Text style={styles.infoText}>Mon, Oct 20</Text>
+                <Text style={styles.infoText}>{displayDate}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="location-outline" size={16} color="#4DB6AC" />
+                <Text style={styles.infoText}>
+                  {loading ? "Chargement..." : city || "Ville inconnue"}
+                </Text>
               </View>
             </View>
           </View>
@@ -153,12 +249,12 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
           >
             <Text style={styles.sectionTitle}>Recent Styles</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {user.outfits.map((style, id) => (
-                <View key={id}>
+              {user.outfits.map((style) => (
+                <View key={style.id}>
                   {style.outfitPic ? (
                     <TouchableOpacity
                       style={styles.outfitCard}
-                      onPress={() => setSelectedOutfit(id)}
+                      onPress={() => handleDisplayOutfit(style.id)}
                     >
                       <Image
                         source={{
@@ -175,7 +271,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                   ) : (
                     <TouchableOpacity
                       style={styles.outfitCard}
-                      onPress={() => setSelectedOutfit(id)}
+                      onPress={() => handleDisplayOutfit(style.id)}
                     >
                       <View style={styles.badge}>
                         <Ionicons name="star" size={12} color="#fff" />
@@ -197,7 +293,12 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                   style={styles.closetItem}
                   onPress={() => onNavigateToCloset(item.category)}
                 >
-                  <View style={styles.closetPreview} />
+                  <Image
+                    source={item.image}
+                    style={styles.itemImage}
+                    resizeMode="cover"
+                  />
+                  {/* <View style={styles.closetPreview} /> */}
                   <Text style={styles.closetLabel}>{item.category}</Text>
                 </TouchableOpacity>
               ))}
@@ -243,7 +344,7 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
             animationType="slide"
             transparent
           >
-            <View style={styles.modalContainer}>
+            {/* <View style={styles.modalContainer}>
               <View style={styles.modalBox}>
                 <Text style={styles.modalTitle}>Outfit Feedback</Text>
                 <Text style={styles.modalText}>
@@ -256,14 +357,22 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
                   <Text style={styles.modalButtonText}>Close</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
+            <OutfitDisplay
+              selectedOutfit={selectedOutfit}
+              onClose={() => handleCloseDisplayOutfit()}
+              picture={picture}
+              starRate={starRate}
+              styleComments={styleComments}
+              improvementSuggestions={improvementSuggestions}
+              deleteOutfit={() => handleDeleteOutfit(selectedOutfit)}
+            />
           </Modal>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   header: {
@@ -286,8 +395,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   deleteIcon: {
-    flexDirection: "row", // ✅ Disposition horizontale
-    justifyContent: "flex-end", // ✅ Aligner à droite
+    flexDirection: "row", // :white_check_mark: Disposition horizontale
+    justifyContent: "flex-end", // :white_check_mark: Aligner à droite
     width: "100%",
     marginBottom: 8,
     paddingRight: 5,
@@ -353,7 +462,13 @@ const styles = StyleSheet.create({
     right: 0,
   },
   greeting: { fontSize: 18, color: "#222", marginVertical: 12 },
-  infoRow: { flexDirection: "row", gap: 16 },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    rowGap: 8,
+  },
   infoItem: { flexDirection: "row", alignItems: "center", gap: 6 },
   infoText: { color: "#777" },
   content: { padding: 20 },
@@ -470,5 +585,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 12,
+  },
+  itemImage: {
+    width: "75%",
+    height: "65%",
+    borderRadius: 10,
+    marginBottom: 6,
   },
 });
