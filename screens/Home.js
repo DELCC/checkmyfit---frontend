@@ -395,8 +395,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   deleteIcon: {
-    flexDirection: "row", // ✅ Disposition horizontale
-    justifyContent: "flex-end", // ✅ Aligner à droite
+    flexDirection: "row", // :white_check_mark: Disposition horizontale
+    justifyContent: "flex-end", // :white_check_mark: Aligner à droite
     width: "100%",
     marginBottom: 8,
     paddingRight: 5,

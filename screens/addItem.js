@@ -10,30 +10,35 @@ import {
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect } from "react";
 import AIResponse from "../components/AIResponse";
 import CameraViewStyleItem from "../components/CameraViewStyleItem";
 import DropDownPicker from "react-native-dropdown-picker";
+import { useSelector } from "react-redux";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
 export default function addItem({ navigation }) {
-  const [isLoading, setIsLoading] = useState(true);
   const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
   const [modalResultVisible, setModalResultVisible] = useState(false);
+  const [addSuccess, setAddSuccess] = useState(null); // true = success, false = error
   const [cloudinaryUrl, setCloudinaryUrl] = useState("");
   const [cloudinaryPublicId, setCloudinaryPublicId] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("Tops");
+
+  const token = useSelector((state) => state.users.value.token);
+  console.log(`Token dispo dans addItem ${token}`);
 
   const closetCategories = [
-    "All",
     "Tops",
     "Bottoms",
     "Dresses",
     "Outerwear",
     "Shoes",
     "Accessories",
+    "Others",
   ];
 
   const selectedStylist = {
@@ -95,6 +100,45 @@ export default function addItem({ navigation }) {
   // Show Modal for picture
   const handleTakePhoto = () => {
     setModalPhotoVisible(true);
+  };
+
+  console.log(`URL dispo dans addItem ${cloudinaryUrl}`);
+  // Add item to dressing
+  const handleAddItemToDressing = () => {
+    fetch(`${API_IP}:${API_PORT}/items/${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemPic: cloudinaryUrl,
+        type: selectedCategory,
+        color: selectedColor,
+        season: selectedSeason,
+        occasion: selectedEvent,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          // success case
+          console.log("Item added to dressing:", data);
+          setAddSuccess(true);
+          setModalResultVisible(true);
+          // auto-hide modal after 1 second
+          setTimeout(() => {
+            setModalResultVisible(false);
+            setAddSuccess(null);
+          }, 2000);
+        } else {
+          setAddSuccess(false);
+          setModalResultVisible(true);
+          setTimeout(() => {
+            setModalResultVisible(false);
+            setAddSuccess(null);
+          }, 2000);
+        }
+      });
   };
 
   return (
@@ -234,10 +278,10 @@ export default function addItem({ navigation }) {
             listMode="SCROLLVIEW"
           />
 
-          {/* Navigate to Home */}
+          {/* Add item to dressing */}
 
           <TouchableOpacity
-            // onPress={() => navigation.navigate("Home")}
+            onPress={() => handleAddItemToDressing()}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
@@ -254,7 +298,7 @@ export default function addItem({ navigation }) {
             <Text style={styles.buttonText}>Go back Home</Text>
           </TouchableOpacity>
 
-          {/* Modal*/}
+          {/* Modal Photo*/}
 
           <Modal
             visible={modalPhotoVisible}
@@ -266,16 +310,43 @@ export default function addItem({ navigation }) {
               getCloudinaryData={getCloudinaryData}
             />
           </Modal>
+          {/* Modal Result*/}
           <Modal
             visible={modalResultVisible}
-            animationType="slide"
-            transparent={false}
+            animationType="fade"
+            transparent={true}
           >
-            <AIResponse
-              onClose={() => setModalResultVisible(false)}
-              selectedStylist={selectedStylist}
-              isLoading={isLoading}
-            />
+            <View style={styles.resultModalOverlay}>
+              {addSuccess === true && (
+                <LinearGradient
+                  colors={["#00A6A6", "#A8E6CF"]}
+                  start={[0, 0]}
+                  end={[1, 1]}
+                  style={styles.resultModalBox}
+                >
+                  <Text style={styles.resultIcon}>✅</Text>
+                  <Text style={styles.resultTitle}>Item added</Text>
+                  <Text style={styles.resultSubtitle}>
+                    Your item was saved to your wardrobe
+                  </Text>
+                </LinearGradient>
+              )}
+
+              {addSuccess === false && (
+                <LinearGradient
+                  colors={["#FF6B6B", "#F97373"]}
+                  start={[0, 0]}
+                  end={[1, 1]}
+                  style={styles.resultModalBox}
+                >
+                  <Text style={styles.resultIcon}>❌</Text>
+                  <Text style={styles.resultTitle}>Failed</Text>
+                  <Text style={styles.resultSubtitle}>
+                    Could not add the item. Try again.
+                  </Text>
+                </LinearGradient>
+              )}
+            </View>
           </Modal>
         </ScrollView>
       </SafeAreaView>
@@ -420,5 +491,56 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 3,
+  },
+  resultModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  resultModalBox: {
+    minWidth: 280,
+    paddingVertical: 22,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+  },
+  resultSuccessText: {
+    color: "#16A34A",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  resultErrorText: {
+    color: "#DC2626",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  resultInfoText: {
+    color: "#374151",
+    fontSize: 16,
+  },
+  resultIcon: {
+    fontSize: 40,
+    marginBottom: 8,
+  },
+  resultTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+  resultSubtitle: {
+    color: "rgba(255,255,255,0.95)",
+    fontSize: 13,
+    textAlign: "center",
+  },
+  resultProcessingBox: {
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });
