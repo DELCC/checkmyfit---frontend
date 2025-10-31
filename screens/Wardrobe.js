@@ -58,6 +58,33 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
   );
   console.log("Fetched items data:", itemsdata);
 
+  // Function to handle item deletion
+
+  const handleDeleteItem = (itemId) => {
+    fetch(`${API_IP}:${API_PORT}/items/${itemId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          console.log("Item deleted successfully");
+          setItemsData((prevItems) =>
+            prevItems.filter((item) => item._id !== itemId)
+          );
+          setSelectedItem(null);
+        } else {
+          console.log("Error deleting item:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.log("Network error deleting item:", error);
+      });
+  };
+
   // Use real items from backend state
   const filteredItems =
     selectedCategory === "All"
@@ -102,9 +129,6 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>My Virtual Closet</Text>
           <View style={styles.headerButtons}>
-            <TouchableOpacity style={styles.filterButton}>
-              <Filter width={16} height={16} />
-            </TouchableOpacity>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate("addItem")}
@@ -128,7 +152,7 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
                   style={[
                     styles.categoryBadge,
                     isSelected
-                      ? { backgroundColor: "#6C5DD3" }
+                      ? { backgroundColor: "#00A6A6" }
                       : {
                           backgroundColor: "#fff",
                           borderColor: "#D2B48C",
@@ -238,7 +262,9 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
               <View style={styles.modalButtons}>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.deleteButton]}
-                  onPress={() => {}}
+                  onPress={() => {
+                    handleDeleteItem(selectedItem._id);
+                  }}
                 >
                   <Text style={styles.buttonText}>Delete</Text>
                 </TouchableOpacity>
@@ -291,8 +317,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "#6C5DD3",
+    backgroundColor: "#00A6A6",
     borderRadius: 6,
+    width: "100%",
+    height: 50,
+    justifyContent: "center",
   },
   addButtonText: {
     color: "#fff",
@@ -365,7 +394,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addItemButton: {
-    backgroundColor: "#6C5DD3",
+    backgroundColor: "#00A6A6",
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 10,
@@ -433,10 +462,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   deleteButton: {
-    backgroundColor: "#F44336",
+    backgroundColor: "#de6c63ff",
   },
   editButton: {
-    backgroundColor: "#6C5DD3",
+    backgroundColor: "#00A6A6",
   },
   buttonText: {
     color: "#fff",
