@@ -19,6 +19,7 @@ import OutfitDisplay from "../components/OutfitDisplay";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
 
 export default function HomeScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(true);
@@ -32,7 +33,9 @@ export default function HomeScreen({ navigation, route }) {
   const [styleComments, setStyleComments] = useState("");
   const [improvementSuggestions, setImprovementSuggestions] = useState([]);
   const [picture, setPicture] = useState("");
-
+  const [meteo, setMeteo] = useState("");
+  const [temperature, setTemperature] = useState("");
+  const [loadingMeteo, setLoadingMeteo] = useState(true);
   const date = new Date();
   const displayDate =
     date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
@@ -205,6 +208,32 @@ export default function HomeScreen({ navigation, route }) {
     { weather: "Clouds", icon: "cloudy" },
   ];
 
+  console.log(lat);
+  console.log(lon);
+
+  useEffect(() => {
+    if (lat && lon) {
+      fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setMeteo(data.weather[0].main);
+          setTemperature(Math.round(data.main.temp - 273.15));
+          setLoadingMeteo(false);
+        })
+        .catch((error) => console.log(error));
+    } else {
+      return;
+    }
+  }, [lat, lon]);
+
+  // console.log(meteo);
+  // console.log(temperature);
+
+  const currentWeather = weatherTypes.find((e) => e.weather === meteo);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -261,8 +290,22 @@ export default function HomeScreen({ navigation, route }) {
             </Text>
             <View style={styles.infoRow}>
               <View style={styles.infoItem}>
-                <Ionicons name="cloud-outline" size={18} color="#7BAACF" />
-                <Text style={styles.infoText}>72°F</Text>
+                {currentWeather ? (
+                  <View>
+                    <Ionicons
+                      name={currentWeather.icon}
+                      size={18}
+                      color="#7BAACF"
+                    />
+                    <Text style={styles.infoText}>{temperature}°C</Text>
+                  </View>
+                ) : (
+                  <View>
+                    <Text style={styles.infoText}>
+                      {loading ? "Chargement..." : "Température Inconnue"}
+                    </Text>
+                  </View>
+                )}
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="calendar-outline" size={16} color="#666" />
@@ -271,7 +314,7 @@ export default function HomeScreen({ navigation, route }) {
               <View style={styles.infoItem}>
                 <Ionicons name="location-outline" size={16} color="#4DB6AC" />
                 <Text style={styles.infoText}>
-                  {loading ? "Chargement..." : city || "Ville inconnue"}
+                  {loadingMeteo ? "Chargement..." : city || "Ville inconnue"}
                 </Text>
               </View>
             </View>
