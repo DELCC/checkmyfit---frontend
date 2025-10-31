@@ -8,7 +8,13 @@ import {
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { Edit2, Sparkles, Bell, Settings } from "lucide-react-native";
+import {
+  Edit2,
+  Sparkles,
+  Bell,
+  Settings,
+  ArrowLeft,
+} from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/users";
 
@@ -25,6 +31,14 @@ export default function Profile({ navigation }) {
     navigation.navigate("Auth");
   };
 
+  const defaultAssistant = {
+    aiassistantName: "Yoann",
+    aiassistantStyle: ["Creative", "Friendly"],
+    aiassistantPic: "https://your-default-image-url.png",
+  };
+
+  const assistant = userData?.aiAssistant || defaultAssistant;
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -34,14 +48,11 @@ export default function Profile({ navigation }) {
             <Text style={styles.title}>Check My Fit AI</Text>
             <Text style={styles.subtitle}>Profile</Text>
           </View>
-          <View style={styles.icons}>
+          {/* <View style={styles.icons}>
             <TouchableOpacity style={styles.iconButton}>
-              <Bell size={20} color="#333" />
+              <ArrowLeft size={20} color="#333" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Settings size={20} color="#333" />
-            </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -134,15 +145,13 @@ export default function Profile({ navigation }) {
                 style={styles.aiAvatar}
               >
                 <Text style={styles.aiInitials}>
-                  {userData.aiAssistant.aiassistantName[0]?.toUpperCase()}
+                  {assistant.aiassistantName[0].toUpperCase()}
                 </Text>
               </LinearGradient>
               <View>
-                <Text style={styles.aiName}>
-                  {userData.aiAssistant.aiassistantName}
-                </Text>
+                <Text style={styles.aiName}>{assistant.aiassistantName}</Text>
                 <Text style={styles.aiTagline}>
-                  {userData.aiAssistant.aiassistantStyle.join(" • ")}
+                  {assistant.aiassistantStyle.join(" • ")}
                 </Text>
               </View>
             </LinearGradient>
@@ -189,8 +198,8 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: "600" },
   subtitle: { fontSize: 14, color: "#6B7280" },
-  icons: { flexDirection: "row", gap: 12 },
-  iconButton: { padding: 6 },
+  // icons: { flexDirection: "row", gap: 12 },
+  // iconButton: { padding: 6 },
   profileCard: {
     backgroundColor: "white",
     margin: 16,
