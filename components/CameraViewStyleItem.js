@@ -1,13 +1,24 @@
 import { useEffect, useState, useRef } from "react";
+// import { CameraView, Camera, CameraType, FlashMode } from "expo-camera";
 import { CameraView, Camera } from "expo-camera";
 import { useIsFocused } from "@react-navigation/native";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { Camera as CameraIcon, Sparkles, X } from "lucide-react-native";
+import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import {
+  Camera as CameraIcon,
+  Sparkles,
+  X,
+  Zap,
+  RotateCw,
+} from "lucide-react-native";
 
 export default function CameraViewStyleItem({ onClose, getCloudinaryData }) {
   const isFocused = useIsFocused();
-
   const [hasPermission, setHasPermission] = useState(false);
+
+  const [facing, setFacing] = useState("back"); // "back" or "front"
+  const [flashStatus, setFlashStatus] = useState("off"); // "off" or "on"
+
+  // const screenWidth = Dimensions.get("window").width;
 
   const cameraRef = useRef(null);
 
@@ -40,6 +51,7 @@ export default function CameraViewStyleItem({ onClose, getCloudinaryData }) {
             console.log(`error`);
           }
         });
+      onClose();
     }
   };
 
@@ -55,16 +67,41 @@ export default function CameraViewStyleItem({ onClose, getCloudinaryData }) {
     return <View />;
   }
 
+  // Cam reverse & flash
+  const toggleCameraFacing = () => {
+    setFacing((prev) => (prev === "back" ? "front" : "back"));
+  };
+
+  const toggleFlashStatus = () => {
+    setFlashStatus((prev) => (prev === "off" ? "on" : "off"));
+  };
+
   return (
     <View style={styles.container}>
-      <CameraView style={{ flex: 1 }} ref={(ref) => (cameraRef.current = ref)}>
+      <CameraView
+        style={{ flex: 1 }}
+        ref={(ref) => (cameraRef.current = ref)}
+        ratio="4:3"
+        facing={facing}
+        flash={flashStatus}
+      >
         <TouchableOpacity
           title="Prendre une photo !"
           onPress={() => takePicture()}
         />
       </CameraView>
       <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-        <X size={28} color="#fff" />
+        <X size={28} color="#00A6A6" />
+      </TouchableOpacity>
+
+      {/*Flash button--------------*/}
+      <TouchableOpacity style={styles.flashButton} onPress={toggleFlashStatus}>
+        <Zap size={24} color={flashStatus === "on" ? "#FFD700" : "#00A6A6"} />
+      </TouchableOpacity>
+
+      {/* Flip camera button top right ---------------*/}
+      <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
+        <RotateCw size={28} color="#ffffffff" />
       </TouchableOpacity>
 
       {/* Capture Button */}
@@ -101,7 +138,7 @@ const styles = StyleSheet.create({
   },
   captureContainer: {
     position: "absolute",
-    bottom: 40,
+    bottom: 20,
     width: "100%",
     alignItems: "center",
   },
@@ -109,9 +146,30 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#6C63FF",
+    backgroundColor: "#00A6A6",
     alignItems: "center",
     justifyContent: "center",
     elevation: 4,
+  },
+  flashButton: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 24,
+    padding: 8,
+  },
+  flipButton: {
+    position: "absolute",
+    bottom: 40, // nicely aligned above the capture button
+    right: 40, // near bottom-right corner
+    backgroundColor: "#00A6A6", // white box
+    borderRadius: 40, // rounded square
+    padding: 10, // inner spacing for the icon
+    elevation: 5, // subtle Android shadow
+    shadowColor: "#000", // subtle iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
 });

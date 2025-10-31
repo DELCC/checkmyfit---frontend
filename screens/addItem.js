@@ -139,6 +139,7 @@ export default function addItem({ navigation }) {
           }, 2000);
         }
       });
+    navigation.navigate("Home");
   };
 
   return (
@@ -164,8 +165,9 @@ export default function addItem({ navigation }) {
                   source={{
                     uri: cloudinaryUrl,
                   }}
-                  style={styles.previewImage}
-                  resizeMode="cover"
+                  // style={styles.previewImage}
+                  // resizeMode="cover"
+                  style={{ width: "100%", height: "100%", borderRadius: 16 }}
                 />
               </View>
             ) : (
@@ -290,13 +292,13 @@ export default function addItem({ navigation }) {
 
           {/* Navigate to Home */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => navigation.navigate("Home")}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>Go back Home</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* Modal Photo*/}
 
@@ -310,6 +312,7 @@ export default function addItem({ navigation }) {
               getCloudinaryData={getCloudinaryData}
             />
           </Modal>
+
           {/* Modal Result*/}
           <Modal
             visible={modalResultVisible}
@@ -393,21 +396,21 @@ const styles = StyleSheet.create({
   },
   previewBox: {
     aspectRatio: 3 / 4,
-    borderRadius: 16,
-    borderWidth: 2,
+    // borderRadius: 16,
+    // borderWidth: 2,
     borderStyle: "dashed",
     borderColor: "#CCC", // équiv. var(--border-gray)
     backgroundColor: "#EEE", // équiv. var(--light-gray)
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 24,
+    // paddingVertical: 24,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
   },
   previewIconContainer: {
-    width: 96,
-    height: 96,
+    width: 100,
+    height: 100,
     borderRadius: 16,
     backgroundColor: "#F6F6F6", // équiv. var(--gradient-soft)
     alignItems: "center",
