@@ -72,7 +72,7 @@ export default function EditProfile({
       setBodyType(user.infoUser.bodyType || "");
       setSkinTone(user.infoUser.skinTone || "");
       setStylePreferences(user.infoUser.stylePreferences || []);
-      setSelectedAssistant(user.infoUser.aiAssistant?._id || null);
+      setSelectedAssistant(user.infoUser.aiAssistant?._id || assistants[0]);
     }
   }, [user.infoUser]);
 
@@ -182,11 +182,13 @@ export default function EditProfile({
         >
           {/* Header ------------------*/}
           <View style={styles.header}>
-            {!route.params?.isNewUser && onBack && (
-              <TouchableOpacity onPress={onBack} style={styles.backButton}>
-                <ArrowLeft size={24} color="#4B5563" />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity style={styles.backButton}>
+              <ArrowLeft
+                size={24}
+                onPress={() => navigation.navigate("Profile")}
+                color="#4B5563"
+              />
+            </TouchableOpacity>
             <View>
               <Text style={styles.headerTitle}>
                 {route.params?.isNewUser
@@ -411,7 +413,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
