@@ -7,6 +7,10 @@ import {
   ScrollView,
   Modal,
   Image,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Platform,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
@@ -34,11 +38,12 @@ export default function AIStylist() {
   const IP_ADDRESS = process.env.EXPO_PUBLIC_API_IP;
   const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
-  const selectedStylist = {
-    initials: "CD",
-    name: "Clément Delcourt",
-    tagline: "Fashion Enthousiasm",
-  };
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.users.value);
+
+  const selectedStylist = user.infoUser.aiAssistant;
+  const selectedStylistPersonnality = selectedStylist.aiAssistantStyle;
+  console.log(selectedStylistPersonnality);
 
   const showPreviewPicture = (photo) => {
     setPreviewPicture(photo.uri);
@@ -69,7 +74,7 @@ export default function AIStylist() {
               //  prompts: ["Rate my Style","I’m dressed for work. Rate my outfit on 5. Give <100 char comment. Give <100 char suggestion."]
               prompts: [
                 // 'You are an AI stylist named Ruddy. Personality: encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: \'Is my outfit appropriate for a job interview in finance?\'. Analyze the outfit in the image. Reply ONLY as JSON with this structure: {"rating": (1-5), "comment": "<260 chars>", "suggestions": ["tip1 <40 chars>", "tip2 <40 chars>", "tip3 <40 chars>", "tip4 <40 chars>"]}. Stay positive and motivational.',
-                `You are an AI stylist named Ruddy. Your personality is encouraging, motivational. Description: Ruddy is here to motivate and encourage, offering positive and practical advice. The user says: ${promptInput}. Analyze the outfit in the image and the context of the user's prompt. Respond ONLY as a raw JSON object with this exact structure: {rating: number from 1 to 5, comment: string max 260 chars, suggestions: array of 4 strings max 40 chars each}. Stay in character and provide helpful, motivational, and positive advice in line with Ruddy’s style.`,
+                `You are an AI stylist named ${selectedStylist.aiassistantName}. Your personality is encouraging, motivational. Description: ${selectedStylist.aiAssistantDescription}. The user says: ${promptInput}. Analyze the outfit in the image and the context of the user's prompt. Respond ONLY as a raw JSON object with this exact structure: {rating: number from 1 to 5, comment: string max 260 chars, suggestions: array of 4 strings max 40 chars each}. Stay in character and provide helpful, motivational, and positive advice in line with Ruddy’s style.`,
               ],
             }),
           })
@@ -104,9 +109,6 @@ export default function AIStylist() {
   };
   // console.log(previewPicture);
 
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.users.value);
-
   const saveOutfit = () => {
     fetch(`${IP_ADDRESS}:${API_PORT}/outfits/${user.token}`, {
       method: "POST",
@@ -137,98 +139,109 @@ export default function AIStylist() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <ScrollView
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.container}
-          contentContainerStyle={styles.content}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.iconContainer}>
-              <Sparkles size={32} color="#fff" />
-            </View>
-            <Text style={styles.title}>Upload or Capture Your Look</Text>
-            <Text style={styles.subtitle}>Get AI feedback on your style</Text>
-          </View>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView
+              style={styles.container}
+              contentContainerStyle={styles.content}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.iconContainer}>
+                  <Sparkles size={32} color="#fff" />
+                </View>
+                <Text style={styles.title}>Upload or Capture Your Look</Text>
+                <Text style={styles.subtitle}>
+                  Get AI feedback on your style
+                </Text>
+              </View>
 
-          {/* Camera Preview */}
-          <View style={styles.previewContainer}>
-            {previewPicture ? (
-              <View style={styles.previewBox}>
-                <Image
-                  source={{
-                    uri: previewPicture,
-                  }}
-                  style={styles.previewImage}
-                  resizeMode="cover"
+              {/* Camera Preview */}
+              <View style={styles.previewContainer}>
+                {previewPicture ? (
+                  <View style={styles.previewBox}>
+                    <Image
+                      source={{
+                        uri: previewPicture,
+                      }}
+                      style={styles.previewImage}
+                      resizeMode="cover"
+                    />
+                  </View>
+                ) : (
+                  <View style={styles.previewBox}>
+                    <View style={styles.previewIconContainer}>
+                      <CameraIcon size={48} color="#999" />
+                    </View>
+                    <Text style={styles.previewText}>Camera Preview</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Take Picture Button */}
+              <TouchableOpacity
+                style={[styles.button, styles.cameraButton]}
+                onPress={() => handleTakePhoto()}
+              >
+                <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.buttonText}>Take Picture</Text>
+              </TouchableOpacity>
+
+              {/* Message Input */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Add a message (optional)</Text>
+                <TextInput
+                  style={styles.textarea}
+                  placeholder="e.g., 'Here's my look for a job interview — is it OK?'"
+                  placeholderTextColor="#999"
+                  multiline
+                  onChangeText={(value) => setPromptInput(value)}
+                  value={promptInput}
                 />
               </View>
-            ) : (
-              <View style={styles.previewBox}>
-                <View style={styles.previewIconContainer}>
-                  <CameraIcon size={48} color="#999" />
-                </View>
-                <Text style={styles.previewText}>Camera Preview</Text>
-              </View>
-            )}
-          </View>
 
-          {/* Take Picture Button */}
-          <TouchableOpacity
-            style={[styles.button, styles.cameraButton]}
-            onPress={() => handleTakePhoto()}
-          >
-            <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Take Picture</Text>
-          </TouchableOpacity>
-
-          {/* Message Input */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Add a message (optional)</Text>
-            <TextInput
-              style={styles.textarea}
-              placeholder="e.g., 'Here's my look for a job interview — is it OK?'"
-              placeholderTextColor="#999"
-              multiline
-              onChangeText={(value) => setPromptInput(value)}
-              value={promptInput}
-            />
-          </View>
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            onPress={() => onSubmit()}
-            style={[styles.button, styles.submitButton]}
-          >
-            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Submit for AI Review</Text>
-          </TouchableOpacity>
-          <Modal
-            visible={modalPhotoVisible}
-            animationType="slide"
-            transparent={false}
-          >
-            <CameraViewStyle
-              onClose={() => setModalPhotoVisible(false)}
-              showPreviewPicture={showPreviewPicture}
-            />
-          </Modal>
-          <Modal
-            visible={modalResultVisible}
-            animationType="slide"
-            transparent={false}
-          >
-            <AIResponse
-              onClose={() => setModalResultVisible(false)}
-              selectedStylist={selectedStylist}
-              isLoading={isLoading}
-              picture={picture}
-              starRate={starRate}
-              styleComments={styleComments}
-              improvementSuggestions={improvementSuggestions}
-              saveOutfit={saveOutfit}
-            />
-          </Modal>
-        </ScrollView>
+              {/* Submit Button */}
+              <TouchableOpacity
+                onPress={() => onSubmit()}
+                style={[styles.button, styles.submitButton]}
+              >
+                <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.buttonText}>Submit for AI Review</Text>
+              </TouchableOpacity>
+              <Modal
+                visible={modalPhotoVisible}
+                animationType="slide"
+                transparent={false}
+              >
+                <CameraViewStyle
+                  onClose={() => setModalPhotoVisible(false)}
+                  showPreviewPicture={showPreviewPicture}
+                />
+              </Modal>
+              <Modal
+                visible={modalResultVisible}
+                animationType="slide"
+                transparent={false}
+              >
+                <AIResponse
+                  onClose={() => setModalResultVisible(false)}
+                  selectedStylist={selectedStylist}
+                  isLoading={isLoading}
+                  picture={picture}
+                  starRate={starRate}
+                  styleComments={styleComments}
+                  improvementSuggestions={improvementSuggestions}
+                  saveOutfit={saveOutfit}
+                />
+              </Modal>
+            </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </SafeAreaProvider>
   );

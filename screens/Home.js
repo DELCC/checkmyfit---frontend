@@ -20,7 +20,7 @@ import OutfitDisplay from "../components/OutfitDisplay";
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
-export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
+export default function HomeScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(true);
   const [selectedOutfit, setSelectedOutfit] = useState(null);
   const [city, setCity] = useState(null);
@@ -128,6 +128,10 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
   console.log(user);
   console.log(selectedOutfit);
 
+  const onNavigateToCloset = (category) => {
+    navigation.navigate("Wardrobe", { initialCategory: category });
+  };
+
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -183,6 +187,24 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
       .catch((error) => console.log(error));
   };
 
+  const weatherTypes = [
+    { weather: "Thunderstorm", icon: "thunderstorm-outline" },
+    { weather: "Drizzle", icon: "rainy-outline" },
+    { weather: "Rain", icon: "rainy" },
+    { weather: "Snow", icon: "snow-outline" },
+    { weather: "Mist", icon: "cloud-outline" },
+    { weather: "Smoke", icon: "cloudy-outline" },
+    { weather: "Haze", icon: "partly-sunny-outline" },
+    { weather: "Dust", icon: "cloudy" },
+    { weather: "Fog", icon: "cloudy-outline" },
+    { weather: "Sand", icon: "cloudy-outline" },
+    { weather: "Ash", icon: "warning-outline" },
+    { weather: "Squall", icon: "cloudy-outline" },
+    { weather: "Tornado", icon: "trail-sign-outline" },
+    { weather: "Clear", icon: "sunny" },
+    { weather: "Clouds", icon: "cloudy" },
+  ];
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -214,9 +236,21 @@ export default function HomeScreen({ navigation, route, onNavigateToCloset }) {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerTop}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>JD</Text>
-              </View>
+              {user.infoUser.profilePic ? (
+                <View style={styles.avatar}>
+                  <Image
+                    source={{
+                      uri: user.infoUser.profilePic,
+                    }}
+                    style={styles.avatarImage}
+                    resizeMode="cover"
+                  />
+                </View>
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>JD</Text>
+                </View>
+              )}
               <View>
                 <Ionicons name="notifications-outline" size={24} color="#666" />
                 <View style={styles.notificationDot} />
@@ -452,6 +486,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatarText: { color: "#fff", fontWeight: "bold", fontSize: 18 },
+  avatarImage: { width: 48, height: 48, borderRadius: 24 },
   notificationDot: {
     width: 8,
     height: 8,

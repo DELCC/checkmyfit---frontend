@@ -46,6 +46,7 @@ export default function App() {
         <Tab.Screen
           name="Wardrobe"
           component={Wardrobe}
+          initialParams={tabParams}
           options={{
             tabBarIcon: () => <ShoppingBag color="#FF7F50" size={24} />, // couleur et taille différentes
           }}
