@@ -13,7 +13,7 @@ import {
 import { Filter, Plus, X } from "lucide-react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
-
+import { useIsFocused } from "@react-navigation/native";
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
@@ -27,15 +27,19 @@ const closetCategories = [
   "Accessories",
 ];
 
-export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
+export default function Wardrobe({ onAddItem, navigation, route }) {
   const [itemsdata, setItemsData] = useState([]);
   const token = useSelector((state) => state.users.value.token);
   console.log(`Token dispo dans addItem ${token}`);
+  const isFocused = useIsFocused();
+  const { initialCategory } = route.params;
 
   // State for category clothes selection
   const [selectedCategory, setSelectedCategory] = useState(
-    initialCategory || "All"
+    // initialCategory || "All"
+    initialCategory || "All"+
   );
+
   const [selectedItem, setSelectedItem] = useState(null);
 
   // Fetch items from backend API on component mount and when itemsdata changes
@@ -94,7 +98,13 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
       </TouchableOpacity>
     );
   };
+  useEffect(() => {
+    if (isFocused && initialCategory) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [isFocused, initialCategory]);
 
+  console.log(selectedCategory);
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>

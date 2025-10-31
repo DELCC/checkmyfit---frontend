@@ -52,6 +52,7 @@ export default function Signup({ navigation }) {
             navigation.navigate("Home", {
               isNewUser: true,
             });
+            console.log(data);
           } else {
             console.log("no token");
           }
