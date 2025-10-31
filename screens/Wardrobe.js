@@ -10,7 +10,8 @@ import {
   Modal,
   Image,
 } from "react-native";
-import { Filter, Plus, X } from "lucide-react-native";
+import { Plus, X } from "lucide-react-native";
+import { CategoryIcon } from "../components/CategoryIcons";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { useIsFocused } from "@react-navigation/native";
@@ -34,10 +35,19 @@ export default function Wardrobe({ onAddItem, navigation, route }) {
   const isFocused = useIsFocused();
   const { initialCategory } = route.params;
 
+  // Categories items for design filter pills
+
+  const categories = [
+    { name: "Tops", icon: "tops", count: 24 },
+    { name: "Bottoms", icon: "bottoms", count: 18 },
+    { name: "Shoes", icon: "shoes", count: 12 },
+    { name: "Accessories", icon: "accessories", count: 8 },
+  ];
+
   // State for category clothes selection
   const [selectedCategory, setSelectedCategory] = useState(
     // initialCategory || "All"
-    initialCategory || "All"+
+    initialCategory || "All"
   );
 
   const [selectedItem, setSelectedItem] = useState(null);
@@ -187,6 +197,26 @@ export default function Wardrobe({ onAddItem, navigation, route }) {
             })}
           </ScrollView>
         </View>
+
+        {/* category filter pills
+
+        <View style={styles.grid}>
+          {categories.map((category) => (
+            <View key={category.name} style={styles.categoryItem}>
+              <View style={styles.iconWrapper}>
+                <CategoryIcon
+                  category={category.name}
+                  size={28}
+                  color="#00A6A6"
+                />
+              </View>
+              <View style={styles.labelWrapper}>
+                <Text style={styles.categoryName}>{category.name}</Text>
+                <Text style={styles.categoryCount}>{category.count}</Text>
+              </View>
+            </View>
+          ))}
+        </View> */}
 
         {/* Items Grid */}
         {!itemsdata || itemsdata.length === 0 ? (
@@ -490,5 +520,30 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "700",
+  },
+  categoryItem: {
+    width: "23%", // approximativement 4 colonnes avec gap
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  iconWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#A8E6CF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 6,
+  },
+  labelWrapper: {
+    alignItems: "center",
+  },
+  categoryName: {
+    fontSize: 12,
+    color: "#111827",
+  },
+  categoryCount: {
+    fontSize: 12,
+    color: "#6b7280",
   },
 });
