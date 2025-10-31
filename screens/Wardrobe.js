@@ -33,7 +33,7 @@ export default function Wardrobe({ onAddItem, navigation, route }) {
   const token = useSelector((state) => state.users.value.token);
   console.log(`Token dispo dans addItem ${token}`);
   const isFocused = useIsFocused();
-  const { initialCategory } = route.params;
+  const { initialCategory } = route?.params || {};
 
   // Categories items for design filter pills
 

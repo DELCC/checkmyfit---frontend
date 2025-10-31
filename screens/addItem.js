@@ -124,23 +124,21 @@ export default function addItem({ navigation }) {
         if (data.result) {
           // success case
           console.log("Item added to dressing:", data);
-          setAddSuccess(true);
-          setModalResultVisible(true);
-          // auto-hide modal after 1 second
-          setTimeout(() => {
-            setModalResultVisible(false);
-            setAddSuccess(null);
-          }, 2000);
+          navigation.navigate("Wardrobe");
+          setCloudinaryUrl("");
+          setSelectedCategory("Tops");
+          setSelectedColor(null);
+          setSelectedSeason(null);
+          setSelectedEvent(null);
         } else {
           setAddSuccess(false);
           setModalResultVisible(true);
           setTimeout(() => {
             setModalResultVisible(false);
             setAddSuccess(null);
-          }, 2000);
+          }, 1000);
         }
       });
-    navigation.navigate("Wardrobe");
   };
 
   return (
