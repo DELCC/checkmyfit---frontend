@@ -10,7 +10,12 @@ import {
 } from "react-native";
 
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Camera as CameraIcon, Sparkles, ThumbsUp } from "lucide-react-native";
+import {
+  Camera as CameraIcon,
+  Sparkles,
+  ThumbsUp,
+  ArrowLeft,
+} from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect } from "react";
 // import AIResponse from "../components/AIResponse";
@@ -150,10 +155,24 @@ export default function addItem({ navigation }) {
         >
           {/* Header */}
           <View style={styles.header}>
-            <View style={styles.iconContainer}>
+            <TouchableOpacity style={styles.backButton}>
+              <ArrowLeft
+                size={24}
+                onPress={() => navigation.navigate("Wardrobe")}
+                color="#4B5563"
+              />
+            </TouchableOpacity>
+
+            {/* <View style={styles.iconContainer}>
               <Sparkles size={32} color="#fff" />
             </View>
-            <Text style={styles.title}>Add item to your virtual dressing</Text>
+            <Text style={styles.title}>Add item to your virtual dressing</Text> */}
+            <View style={styles.headerTitle}>
+              <Sparkles color="#4CC9F0" size={24} />
+              <Text style={styles.headerText}>
+                Add an item to your virtual dressing
+              </Text>
+            </View>
           </View>
 
           {/* Camera Preview */}
@@ -437,8 +456,16 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
   },
   header: {
+    // alignItems: "center",
+    // marginBottom: 40,
+    // backgroundColor: "#FFFFFF",
+    // paddingVertical: 20,
+    // paddingHorizontal: 10,
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#E5E5E5",
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 16,
   },
   iconContainer: {
     width: 64,
@@ -626,5 +653,18 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  backButton: {
+    marginRight: 16,
+  },
+  headerTitle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222222",
   },
 });

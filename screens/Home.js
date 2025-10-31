@@ -72,8 +72,8 @@ export default function HomeScreen({ navigation, route }) {
       category: "Accessories",
       image: require("../assets/accessories.png"),
     },
-    // { id: 5, category: "Outerwear", image: require("../assets/outerwear.png") },
-    // { id: 6, category: "Dresses", image: require("../assets/dresses.png") },
+    { id: 5, category: "Outerwear", image: require("../assets/outerwear.png") },
+    { id: 6, category: "Dresses", image: require("../assets/dresses.png") },
   ];
 
   const dispatch = useDispatch();
