@@ -85,6 +85,14 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
       });
   };
 
+  // Function to handle item editing
+  const handleEditItem = (item) => {
+    setSelectedItem(null);
+    navigation.navigate("editItem", { item });
+    setSelectedItem(null);
+    console.log(`selectedItem ${item._id} for editing`);
+  };
+
   // Use real items from backend state
   const filteredItems =
     selectedCategory === "All"
@@ -271,7 +279,9 @@ export default function Wardrobe({ onAddItem, initialCategory, navigation }) {
 
                 <TouchableOpacity
                   style={[styles.modalButton, styles.editButton]}
-                  onPress={() => {}}
+                  onPress={() => {
+                    handleEditItem(selectedItem);
+                  }}
                 >
                   <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
