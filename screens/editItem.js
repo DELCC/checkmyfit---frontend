@@ -3,31 +3,29 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  // TextInput,
+  TextInput,
   ScrollView,
   Modal,
   Image,
 } from "react-native";
-
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Camera as CameraIcon, Sparkles, ThumbsUp } from "lucide-react-native";
+import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useEffect } from "react";
-// import AIResponse from "../components/AIResponse";
-import CameraViewStyleItem from "../components/CameraViewStyleItem";
+import { useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useSelector } from "react-redux";
 
 const API_IP = process.env.EXPO_PUBLIC_API_IP;
 const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
 
-export default function addItem({ navigation }) {
-  const [modalPhotoVisible, setModalPhotoVisible] = useState(false);
+export default function addItem({ navigation, route }) {
   const [modalResultVisible, setModalResultVisible] = useState(false);
-  const [addSuccess, setAddSuccess] = useState(null); // true = success, false = error
-  const [cloudinaryUrl, setCloudinaryUrl] = useState("");
-  const [cloudinaryPublicId, setCloudinaryPublicId] = useState("");
+  const [addSuccess, setAddSuccess] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("Tops");
+
+  // Get item data from Wardrobe screen if editing an existing item
+  const { item } = route.params || {};
+  console.log(`la photo de mon item ${item.itemPic}`);
 
   const token = useSelector((state) => state.users.value.token);
   console.log(`Token dispo dans addItem ${token}`);
@@ -42,21 +40,21 @@ export default function addItem({ navigation }) {
     "Others",
   ];
 
-  // const selectedStylist = {
-  //   initials: "CD",
-  //   name: "Clément Delcourt",
-  //   tagline: "Fashion Enthousiasm",
-  // };
+  const selectedStylist = {
+    initials: "CD",
+    name: "Clément Delcourt",
+    tagline: "Fashion Enthousiasm",
+  };
 
   // elems for colors dropdown picker
   const colors = ["White", "Blue", "Dark", "Red", "Green", "Other"];
-  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(item.color || null);
   const [colorOpen, setColorOpen] = useState(false);
   console.log(selectedColor);
 
   // elems for seasons dropdown picker
   const seasons = ["Summer", "Autumn", "Winter", "Spring"];
-  const [selectedSeason, setSelectedSeason] = useState(null);
+  const [selectedSeason, setSelectedSeason] = useState(item.season || null);
   const [seasonOpen, setSeasonOpen] = useState(false);
   console.log(selectedSeason);
 
@@ -68,51 +66,21 @@ export default function addItem({ navigation }) {
     "Outdoor",
     "Vacation",
   ];
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(item.occasion || null);
   const [eventOpen, setEventOpen] = useState(false);
   console.log(selectedEvent);
 
-  // Inverse Data Flow - get Cloudinary URL from CameraViewStyleItem.js
-  const getCloudinaryData = (url, publicId) => {
-    setCloudinaryUrl(url);
-    setCloudinaryPublicId(publicId);
-  };
-  console.log(`Id dispo dans addItem ${cloudinaryPublicId}`);
+  // edit an item in wardrobe
 
-  const handleRemoveBackground = () => {
-    if (cloudinaryUrl && cloudinaryPublicId) {
-      fetch(`${API_IP}:${API_PORT}/items/removeBackground`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cloudinaryPublicId }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setCloudinaryUrl(data.transformedUrl);
-          console.log(data.transformedUrl);
-        });
-    } else {
-      console.log("error : issue with image transformation");
-    }
-  };
-
-  // Show Modal for picture
-  const handleTakePhoto = () => {
-    setModalPhotoVisible(true);
-  };
-
-  console.log(`URL dispo dans addItem ${cloudinaryUrl}`);
-  // Add item to dressing
-  const handleAddItemToDressing = () => {
-    fetch(`${API_IP}:${API_PORT}/items/${token}`, {
-      method: "POST",
+  const handleEditItem = () => {
+    fetch(`${API_IP}:${API_PORT}/items/${item._id}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        itemPic: cloudinaryUrl,
+        token,
+        itemPic: item.itemPic,
         type: selectedCategory,
         color: selectedColor,
         season: selectedSeason,
@@ -123,14 +91,8 @@ export default function addItem({ navigation }) {
       .then((data) => {
         if (data.result) {
           // success case
-          console.log("Item added to dressing:", data);
-          setAddSuccess(true);
-          setModalResultVisible(true);
-          // auto-hide modal after 1 second
-          setTimeout(() => {
-            setModalResultVisible(false);
-            setAddSuccess(null);
-          }, 2000);
+          console.log("Item updated:", data);
+          navigation.navigate("Wardrobe");
         } else {
           setAddSuccess(false);
           setModalResultVisible(true);
@@ -140,7 +102,6 @@ export default function addItem({ navigation }) {
           }, 2000);
         }
       });
-    navigation.navigate("Wardrobe");
   };
 
   return (
@@ -155,20 +116,19 @@ export default function addItem({ navigation }) {
             <View style={styles.iconContainer}>
               <Sparkles size={32} color="#fff" />
             </View>
-            <Text style={styles.title}>Add item to your virtual dressing</Text>
+            <Text style={styles.title}>Edit your item below 😎👇</Text>
           </View>
 
           {/* Camera Preview */}
           <View style={styles.previewContainer}>
-            {cloudinaryUrl ? (
+            {item.itemPic ? (
               <View style={styles.previewBox}>
                 <Image
                   source={{
-                    uri: cloudinaryUrl,
+                    uri: item.itemPic,
                   }}
-                  // style={styles.previewImage}
-                  // resizeMode="cover"
-                  style={{ width: "100%", height: "100%", borderRadius: 16 }}
+                  style={styles.previewImage}
+                  resizeMode="cover"
                 />
               </View>
             ) : (
@@ -181,73 +141,8 @@ export default function addItem({ navigation }) {
             )}
           </View>
 
-          {/* Take Picture Button */}
-          {/* <TouchableOpacity
-            style={[styles.button, styles.cameraButton]}
-            onPress={() => handleTakePhoto()}
-          >
-            <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Take Picture</Text>
-          </TouchableOpacity> */}
-          <LinearGradient
-            colors={["#007F8C", "#00C896"]} // gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.saveButton}
-          >
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                // flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingVertical: 14, // same as Remove Background button
-                paddingHorizontal: 16,
-              }}
-              onPress={() => handleTakePhoto()}
-            >
-              <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={styles.saveButtonText}>Take Picture</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-
-          {/* Remove Background with AI Button */}
-          {/* <TouchableOpacity
-            onPress={() => handleRemoveBackground()}
-            style={[styles.button, styles.submitButton]}
-          >
-            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Remove background with AI</Text>
-          </TouchableOpacity> */}
-          <LinearGradient
-            colors={["#007F8C", "#00C896"]} // gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.saveButton}
-          >
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                // flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingVertical: 14, // same as Remove Background button
-                paddingHorizontal: 16,
-              }}
-              onPress={() => handleRemoveBackground()}
-            >
-              <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={styles.saveButtonText}>
-                Remove background with AI
-              </Text>
-            </TouchableOpacity>
-          </LinearGradient>
-
           {/* Category Pills */}
-
-          <Text style={styles.label}>Type</Text>
+          <Text style={styles.label}>Category</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -261,16 +156,16 @@ export default function addItem({ navigation }) {
                   style={[
                     styles.categoryBadge,
                     isSelected
-                      ? { backgroundColor: "#00A6A6" }
+                      ? { backgroundColor: "#6C5DD3" }
                       : {
                           backgroundColor: "#fff",
-                          borderColor: "#A8E6CF",
+                          borderColor: "#D2B48C",
                           borderWidth: 1,
                         },
                   ]}
                   onPress={() => setSelectedCategory(category)}
                 >
-                  <Text style={{ color: isSelected ? "#fff" : "#A8E6CF" }}>
+                  <Text style={{ color: isSelected ? "#fff" : "#D2B48C" }}>
                     {category}
                   </Text>
                 </TouchableOpacity>
@@ -329,62 +224,17 @@ export default function addItem({ navigation }) {
             listMode="SCROLLVIEW"
           />
 
-          {/* Add item to dressing */}
+          {/* update item to dressing */}
 
-          {/* <TouchableOpacity
-            onPress={() => handleAddItemToDressing()}
+          <TouchableOpacity
+            onPress={() => handleEditItem()}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Add item to dressing</Text>
-          </TouchableOpacity> */}
-          <LinearGradient
-            colors={["#007F8C", "#00C896"]} // gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.saveButton}
-          >
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                // flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingVertical: 14, // same as Remove Background button
-                paddingHorizontal: 16,
-              }}
-              onPress={() => handleAddItemToDressing()}
-            >
-              <ThumbsUp size={20} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={styles.saveButtonText}>Add item to dressing</Text>
-            </TouchableOpacity>
-          </LinearGradient>
+            <Text style={styles.buttonText}>Update my item </Text>
+          </TouchableOpacity>
 
-          {/* Navigate to Home */}
-
-          {/* <TouchableOpacity
-            onPress={() => navigation.navigate("Home")}
-            style={[styles.button, styles.submitButton]}
-          >
-            <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Go back Home</Text>
-          </TouchableOpacity> */}
-
-          {/* Modal Photo*/}
-
-          <Modal
-            visible={modalPhotoVisible}
-            animationType="slide"
-            transparent={false}
-          >
-            <CameraViewStyleItem
-              onClose={() => setModalPhotoVisible(false)}
-              getCloudinaryData={getCloudinaryData}
-            />
-          </Modal>
-
-          {/* Modal Result*/}
+          {/* Modal Result is error when editing*/}
           <Modal
             visible={modalResultVisible}
             animationType="fade"
@@ -431,7 +281,7 @@ export default function addItem({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFA", // équiv. var(--off-white)
+    backgroundColor: "#FAFAFA", // équiv. var(--lightest-gray)
   },
   content: {
     paddingHorizontal: 24,
@@ -446,7 +296,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 16,
-    backgroundColor: "#00A6A6", // équiv. var(--gradient-ai)
+    backgroundColor: "#6C63FF", // équiv. var(--gradient-ai)
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -467,21 +317,21 @@ const styles = StyleSheet.create({
   },
   previewBox: {
     aspectRatio: 3 / 4,
-    // borderRadius: 16,
-    // borderWidth: 2,
+    borderRadius: 16,
+    borderWidth: 2,
     borderStyle: "dashed",
     borderColor: "#CCC", // équiv. var(--border-gray)
     backgroundColor: "#EEE", // équiv. var(--light-gray)
     alignItems: "center",
     justifyContent: "center",
-    // paddingVertical: 24,
+    paddingVertical: 24,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
   },
   previewIconContainer: {
-    width: 100,
-    height: 100,
+    width: 96,
+    height: 96,
     borderRadius: 16,
     backgroundColor: "#F6F6F6", // équiv. var(--gradient-soft)
     alignItems: "center",
@@ -505,9 +355,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  cameraButton: {
-    backgroundColor: "#4A90E2", // équiv. var(--gradient-primary)
-  },
   submitButton: {
     backgroundColor: "#6C63FF", // équiv. var(--gradient-ai)
   },
@@ -523,8 +370,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     color: "#333",
-    marginBottom: 2,
-    marginTop: 8,
+    marginBottom: 8,
   },
   textarea: {
     minHeight: 120,
@@ -542,7 +388,6 @@ const styles = StyleSheet.create({
   },
   categories: {
     marginTop: 12,
-    marginBottom: 12,
   },
   categoryBadge: {
     paddingVertical: 6,
@@ -618,15 +463,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 6,
-  },
-  saveButton: {
-    borderRadius: 12,
-    marginBottom: 24,
-    overflow: "hidden",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

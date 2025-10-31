@@ -8,6 +8,7 @@ import Signup from "./screens/Signup";
 import EditProfile from "./screens/EditProfile";
 import HomeScreen from "./screens/Home";
 import addItem from "./screens/addItem";
+import editItem from "./screens/editItem";
 import { Home, ShoppingBag, Camera, Users, User } from "lucide-react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -84,7 +85,8 @@ export default function App() {
           <Stack.Screen name="Home" component={TabNavigator} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
           <Stack.Screen name="addItem" component={addItem} />
-          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="editItem" component={editItem} />
+          <Stack.Screen name="Wardrobe" component={Wardrobe} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
