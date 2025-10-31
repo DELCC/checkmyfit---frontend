@@ -8,8 +8,9 @@ import {
   Modal,
   Image,
 } from "react-native";
+
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { Camera as CameraIcon, Sparkles } from "lucide-react-native";
+import { Camera as CameraIcon, Sparkles, ThumbsUp } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect } from "react";
 // import AIResponse from "../components/AIResponse";
@@ -139,7 +140,7 @@ export default function addItem({ navigation }) {
           }, 2000);
         }
       });
-    navigation.navigate("Home");
+    navigation.navigate("Wardrobe");
   };
 
   return (
@@ -181,24 +182,72 @@ export default function addItem({ navigation }) {
           </View>
 
           {/* Take Picture Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.button, styles.cameraButton]}
             onPress={() => handleTakePhoto()}
           >
             <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>Take Picture</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <LinearGradient
+            colors={["#007F8C", "#00C896"]} // gradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.saveButton}
+          >
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={{
+                // flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingVertical: 14, // same as Remove Background button
+                paddingHorizontal: 16,
+              }}
+              onPress={() => handleTakePhoto()}
+            >
+              <CameraIcon size={20} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.saveButtonText}>Take Picture</Text>
+            </TouchableOpacity>
+          </LinearGradient>
 
           {/* Remove Background with AI Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => handleRemoveBackground()}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>Remove background with AI</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <LinearGradient
+            colors={["#007F8C", "#00C896"]} // gradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.saveButton}
+          >
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={{
+                // flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingVertical: 14, // same as Remove Background button
+                paddingHorizontal: 16,
+              }}
+              onPress={() => handleRemoveBackground()}
+            >
+              <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.saveButtonText}>
+                Remove background with AI
+              </Text>
+            </TouchableOpacity>
+          </LinearGradient>
 
           {/* Category Pills */}
+
+          <Text style={styles.label}>Type</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -212,16 +261,16 @@ export default function addItem({ navigation }) {
                   style={[
                     styles.categoryBadge,
                     isSelected
-                      ? { backgroundColor: "#6C5DD3" }
+                      ? { backgroundColor: "#00A6A6" }
                       : {
                           backgroundColor: "#fff",
-                          borderColor: "#D2B48C",
+                          borderColor: "#A8E6CF",
                           borderWidth: 1,
                         },
                   ]}
                   onPress={() => setSelectedCategory(category)}
                 >
-                  <Text style={{ color: isSelected ? "#fff" : "#D2B48C" }}>
+                  <Text style={{ color: isSelected ? "#fff" : "#A8E6CF" }}>
                     {category}
                   </Text>
                 </TouchableOpacity>
@@ -282,13 +331,35 @@ export default function addItem({ navigation }) {
 
           {/* Add item to dressing */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => handleAddItemToDressing()}
             style={[styles.button, styles.submitButton]}
           >
             <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>Add item to dressing</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <LinearGradient
+            colors={["#007F8C", "#00C896"]} // gradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.saveButton}
+          >
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={{
+                // flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingVertical: 14, // same as Remove Background button
+                paddingHorizontal: 16,
+              }}
+              onPress={() => handleAddItemToDressing()}
+            >
+              <ThumbsUp size={20} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.saveButtonText}>Add item to dressing</Text>
+            </TouchableOpacity>
+          </LinearGradient>
 
           {/* Navigate to Home */}
 
@@ -375,7 +446,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 16,
-    backgroundColor: "#6C63FF", // équiv. var(--gradient-ai)
+    backgroundColor: "#00A6A6", // équiv. var(--gradient-ai)
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -452,7 +523,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     color: "#333",
-    marginBottom: 8,
+    marginBottom: 2,
+    marginTop: 8,
   },
   textarea: {
     minHeight: 120,
@@ -470,6 +542,7 @@ const styles = StyleSheet.create({
   },
   categories: {
     marginTop: 12,
+    marginBottom: 12,
   },
   categoryBadge: {
     paddingVertical: 6,
@@ -545,5 +618,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 6,
+  },
+  saveButton: {
+    borderRadius: 12,
+    marginBottom: 24,
+    overflow: "hidden",
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

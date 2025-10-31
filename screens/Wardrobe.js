@@ -37,7 +37,7 @@ export default function Wardrobe({ onAddItem, navigation, route }) {
   // State for category clothes selection
   const [selectedCategory, setSelectedCategory] = useState(
     // initialCategory || "All"
-    initialCategory || "All"+
+    initialCategory || "All"
   );
 
   const [selectedItem, setSelectedItem] = useState(null);
